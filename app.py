@@ -128,7 +128,97 @@ BUSINESS_TEMPLATES = {
 active_business = dict(BUSINESS_TEMPLATES["clinic"])
 
 # -------------------------------------------------------------
-# 2. RBAC & Users State
+# 2. Multi-Script Library (คลังชุดสคริปต์รายสาย)
+# -------------------------------------------------------------
+SCRIPTS_DB = [
+    {
+        "id": "script_clinic_confirm",
+        "name": "คลินิก: ยืนยันนัดตรวจผิว & เลเซอร์",
+        "business_name": "เดอร์มา แคร์ คลินิก",
+        "industry": "คลินิกความงาม",
+        "agent_name": "น้องฟ้า",
+        "agent_gender": "female",
+        "voice_id": "th-TH-PremwadeeNeural",
+        "tone": "Friendly",
+        "speed": 1.0,
+        "opening_text": "สวัสดีค่ะ ขอเรียนสายคุณ{customer_name} จากเดอร์มา แคร์ คลินิก ค่ะ ไม่ทราบว่าสะดวกคุยสักครู่ไหมคะ",
+        "objective": "ยืนยันนัดหมายตรวจสภาพผิวและเลเซอร์ วันที่ 12 พ.ย. เวลา 14:00 น.",
+        "custom_instructions": "เตือนให้งดออกแดดจัดและงดทายารักษาสิวที่มีกรดผลไม้ก่อนเข้ารับบริการ 24 ชั่วโมง"
+    },
+    {
+        "id": "script_clinic_promo",
+        "name": "คลินิก: แจ้งโปรโมชั่นคอร์สเลเซอร์ ลด 50%",
+        "business_name": "เดอร์มา แคร์ คลินิก",
+        "industry": "คลินิกความงาม",
+        "agent_name": "น้องฟ้า",
+        "agent_gender": "female",
+        "voice_id": "th-TH-PremwadeeNeural",
+        "tone": "Energetic",
+        "speed": 1.0,
+        "opening_text": "สวัสดีค่ะ ขอเรียนสายคุณ{customer_name} จากเดอร์มา แคร์ คลินิก ค่ะ มีข้อเสนอพิเศษเฉพาะสมาชิกคนสำคัญ สะดวกคุยสักครู่ไหมคะ",
+        "objective": "นำเสนอโปรโมชั่นเลเซอร์หน้าใส ลดพิเศษ 50% สำหรับ 20 ท่านแรกของสัปดาห์นี้",
+        "custom_instructions": "หากลูกค้าสนใจ ให้เสนอจองสิทธิ์ล่วงหน้ามัดจำ 500 บาท หรือลงเวลานัดเพื่อเข้ามาทดลองทำ"
+    },
+    {
+        "id": "script_auto_maintain",
+        "name": "อู่ยนต์: เตือนเช็คระยะ 50,000 กม.",
+        "business_name": "ออโต้ แคร์ เซอร์วิส",
+        "industry": "ศูนย์บริการยานยนต์",
+        "agent_name": "น้องนนท์",
+        "agent_gender": "male",
+        "voice_id": "th-TH-NiwatNeural",
+        "tone": "Formal",
+        "speed": 1.0,
+        "opening_text": "สวัสดีครับ ขอเรียนสายคุณ{customer_name} จากศูนย์บริการออโต้ แคร์ เซอร์วิส ครับ ไม่ทราบว่าสะดวกคุยสักครู่ไหมครับ",
+        "objective": "แจ้งเตือนกำหนดเช็คระยะ 50,000 กม. ตรวจเช็คระบบเบรก และเปลี่ยนถ่ายน้ำมันเครื่อง",
+        "custom_instructions": "แจ้งเตือนให้นำสมุดรับประกันรถยนต์มาด้วย และทางศูนย์มีบริการรถรับส่งฟรีระหว่างรอตรวจเช็ค"
+    },
+    {
+        "id": "script_auto_ready",
+        "name": "อู่ยนต์: แจ้งรถซ่อมเสร็จพร้อมส่งมอบ",
+        "business_name": "ออโต้ แคร์ เซอร์วิส",
+        "industry": "ศูนย์บริการยานยนต์",
+        "agent_name": "น้องนนท์",
+        "agent_gender": "male",
+        "voice_id": "th-TH-NiwatNeural",
+        "tone": "Formal",
+        "speed": 1.0,
+        "opening_text": "สวัสดีครับ ขอเรียนสายคุณ{customer_name} จากออโต้ แคร์ เซอร์วิส ครับ ติดต่อแจ้งเรื่องรถซ่อมเสร็จเรียบร้อยแล้วครับ สะดวกคุยสักครู่ไหมครับ",
+        "objective": "แจ้งลูกค้าว่ารถซ่อมเสร็จเรียบร้อยแล้ว สามารถมารับรถได้วันนี้ถึง 18:00 น. หรือวันพรุ่งนี้",
+        "custom_instructions": "แจ้งยอดค่าใช้จ่ายพร้อมใบเสร็จรับประกัน รองรับการชำระผ่านบัตรเครดิตหรือโอนเงินผ่าน PromptPay"
+    },
+    {
+        "id": "script_estate_visit",
+        "name": "อสังหาฯ: นัดหมายเข้าชมห้องตัวอย่างคอนโด",
+        "business_name": "แกรนด์ พรอพเพอร์ตี้",
+        "industry": "อสังหาริมทรัพย์",
+        "agent_name": "น้องพรีม",
+        "agent_gender": "female",
+        "voice_id": "th-TH-PremwadeeNeural",
+        "tone": "Energetic",
+        "speed": 1.0,
+        "opening_text": "สวัสดีค่ะ ขอเรียนสายคุณ{customer_name} จากแกรนด์ พรอพเพอร์ตี้ ค่ะ ติดต่อเรื่องนัดหมายเข้าชมโครงการ สะดวกคุยสักครู่ไหมคะ",
+        "objective": "นัดหมายเข้าเยี่ยมชมห้องตัวอย่าง คอนโด Grand Horizon เสาร์นี้ 13:30 น.",
+        "custom_instructions": "แจ้งสิทธิพิเศษส่วนลด Presale เงินสดสูงสุด 200,000 บาท และฟรีค่าโอนกรรมสิทธิ์เฉพาะผู้เข้าชมสัปดาห์นี้"
+    },
+    {
+        "id": "script_dental_remind",
+        "name": "ทันตกรรม: เตือนนัดตรวจสุขภาพฟัน 6 เดือน",
+        "business_name": "สไมล์ เด็นทัล คลินิก",
+        "industry": "คลินิกทันตกรรม",
+        "agent_name": "น้องน้ำหวาน",
+        "agent_gender": "female",
+        "voice_id": "th-TH-PremwadeeNeural",
+        "tone": "Friendly",
+        "speed": 1.0,
+        "opening_text": "สวัสดีค่ะ ขอเรียนสายคุณ{customer_name} จากสไมล์ เด็นทัล คลินิก ค่ะ ไม่ทราบว่าสะดวกคุยสักครู่ไหมคะ",
+        "objective": "แจ้งเตือนนัดขูดหินปูนและตรวจสุขภาพฟันประจำ 6 เดือน พฤหัสบดีนี้ 15:00 น.",
+        "custom_instructions": "แจ้งเตือนให้บ้วนปากด้วยน้ำเกลือก่อนเข้ารับบริการ และเตรียมบัตรประกันสังคมมาใช้สิทธิ์ทำฟัน 900 บาทฟรี"
+    }
+]
+
+# -------------------------------------------------------------
+# 3. RBAC & Users State
 # -------------------------------------------------------------
 USERS_DB = [
     {
@@ -166,7 +256,7 @@ USERS_DB = [
 current_user = USERS_DB[1]  # Default to Business Owner
 
 # -------------------------------------------------------------
-# 3. PromptPay Packages & Transactions
+# 4. PromptPay Packages & Transactions
 # -------------------------------------------------------------
 PROMPTPAY_PACKAGES = [
     {"id": "pkg_100", "amount": 100, "credits": 100, "bonus": "ปกติ (1 บาท = 1 เครดิต)", "popular": False},
@@ -232,13 +322,14 @@ def generate_promptpay_payload(phone_or_id: str, amount: float) -> str:
     return raw + f"{crc:04X}"
 
 # -------------------------------------------------------------
-# 4. Customer Queue & Scheduler State
+# 5. Customer Queue & Scheduler State
 # -------------------------------------------------------------
 customers_queue = [
     {
         "id": "queue-101",
         "name": "คุณศิริพร สุขเกษม",
         "phone": "089-112-2334",
+        "script_id": "script_clinic_confirm",
         "detail": "ยืนยันคิวตรวจผิวและนัดหมายแพทย์",
         "scheduled_time": "14:30 วันนี้",
         "status": "รอโทรตามเวลา",
@@ -248,7 +339,8 @@ customers_queue = [
         "id": "queue-102",
         "name": "คุณพงษ์ศักดิ์ รัตนวิชัย",
         "phone": "081-998-7711",
-        "detail": "แจ้งเตือนต่ออายุแพ็กเกจประจำปี",
+        "script_id": "script_auto_maintain",
+        "detail": "แจ้งเตือนเช็คระยะ 50,000 กม.",
         "scheduled_time": "15:00 วันนี้",
         "status": "รอโทรตามเวลา",
         "attempts": 0
@@ -257,7 +349,8 @@ customers_queue = [
         "id": "queue-103",
         "name": "คุณอารียา กานต์พิชชา",
         "phone": "092-445-6677",
-        "detail": "คอนเฟิร์มนัดหมายเข้ารับบริการรอบบ่าย",
+        "script_id": "script_estate_visit",
+        "detail": "นัดหมายเข้าชมห้องตัวอย่างคอนโด",
         "scheduled_time": "16:00 วันนี้",
         "status": "รอโทรตามเวลา",
         "attempts": 0
@@ -265,13 +358,14 @@ customers_queue = [
 ]
 
 # -------------------------------------------------------------
-# 5. Calls DB & Active Sessions
+# 6. Calls DB & Active Sessions
 # -------------------------------------------------------------
 calls_db = [
     {
         "id": "call-001",
         "name": "คุณอาย",
         "phone": "084-148-7979",
+        "script_name": "คลินิก: ยืนยันนัดตรวจผิว & เลเซอร์",
         "job_ref": "20261030_1 (TK-1001)",
         "time": "30 ต.ค. 16:59",
         "status": "สำเร็จแล้ว",
@@ -285,6 +379,7 @@ calls_db = [
         "id": "call-002",
         "name": "คุณจ๋า",
         "phone": "093-340-9929",
+        "script_name": "คลินิก: ยืนยันนัดตรวจผิว & เลเซอร์",
         "job_ref": "20261025_1 (db0016)",
         "time": "25 ต.ค. 11:33",
         "status": "สำเร็จแล้ว",
@@ -298,6 +393,7 @@ calls_db = [
         "id": "call-003",
         "name": "คุณทักษิณทร์",
         "phone": "095-307-3480",
+        "script_name": "อู่ยนต์: เตือนเช็คระยะ 50,000 กม.",
         "job_ref": "20261027_2",
         "time": "27 ต.ค. 13:48",
         "status": "สำเร็จแล้ว",
@@ -311,6 +407,7 @@ calls_db = [
         "id": "call-004",
         "name": "คุณมั่ม",
         "phone": "084-007-9950",
+        "script_name": "อสังหาฯ: นัดหมายเข้าชมห้องตัวอย่างคอนโด",
         "job_ref": "20261030_1",
         "time": "31 ต.ค. 12:00",
         "status": "ไม่สำเร็จ ไม่มีผู้รับสาย",
@@ -325,7 +422,7 @@ calls_db = [
 active_sessions = {}
 
 # -------------------------------------------------------------
-# 6. TTS Synthesis Engine
+# 7. TTS Synthesis Engine
 # -------------------------------------------------------------
 def text_to_speech_sync(text: str, filename_prefix="ai_reply") -> str:
     filename = f"{filename_prefix}_{uuid.uuid4().hex[:8]}.mp3"
@@ -341,12 +438,12 @@ def text_to_speech_sync(text: str, filename_prefix="ai_reply") -> str:
 async def synthesize_speech(text: str, voice_id: str = None, speed: float = 1.0, filename_prefix="ai_reply") -> str:
     return await asyncio.to_thread(text_to_speech_sync, text, filename_prefix)
 
-def generate_system_prompt(profile: dict) -> str:
-    biz_name = profile.get("name", "องค์กรของเรา")
-    agent_name = profile.get("agent_name", "เจ้าหน้าที่ AI")
-    biz_desc = profile.get("description", "")
-    tone = profile.get("tone", "Friendly")
-    custom_instructions = profile.get("custom_instructions", "")
+def generate_system_prompt_from_script(script: dict) -> str:
+    biz_name = script.get("business_name") or active_business.get("name", "ศูนย์บริการ")
+    agent_name = script.get("agent_name") or active_business.get("agent_name", "เจ้าหน้าที่ AI")
+    objective = script.get("objective", "ประสานงานบริการลูกค้า")
+    tone = script.get("tone", "Friendly")
+    custom_instructions = script.get("custom_instructions", "")
 
     tone_instruction = {
         "Formal": "ใช้น้ำเสียงและถ้อยคำที่สุภาพอย่างเป็นทางการ ชัดเจน น่าเชื่อถือ",
@@ -355,30 +452,29 @@ def generate_system_prompt(profile: dict) -> str:
     }.get(tone, "ใช้น้ำเสียงสุภาพเป็นมิตร")
 
     prompt = f"""คุณคือ "{agent_name}" เจ้าหน้าที่ Call Center AI ตัวแทนจาก "{biz_name}"
-เกี่ยวกับธุรกิจ: {biz_desc}
+เป้าหมายการโทร: {objective}
 รูปแบบการพูด: {tone_instruction}
 
-หน้าที่หลัก: โทรศัพท์แจ้งเตือน ยืนยันนัดหมาย นำเสนอโปรโมชั่น หรือบริการลูกค้าตามเป้าหมาย
 บทสนทนาต้องกระชับ สุภาพ ชัดเจน และเป็นธรรมชาติที่สุด เหมือนพนักงานโทรจริง ไม่พูดเยิ่นเย้อเกินความจำเป็น
 
 ขั้นตอนการสนทนา:
 1. การตรวจสอบตัวตน: ทักทายและถามยืนยันว่าใช่ [ชื่อลูกค้า] หรือไม่
    - หากปลายทางบอกว่าไม่ใช่ (เช่น เป็นคนอื่น, โทรผิด, ไม่ใช่เจ้าของ): ให้กล่าวขอโทษอย่างสุภาพ แจ้งว่าระบบน่าจะบันทึกเบอร์ผิด และขออนุญาตวางสายทันที
-   - หากใช่: ให้แจ้งเรื่องนัดหมาย/วัตถุประสงค์การโทร และถามว่าสะดวกเข้ารับบริการหรือสะดวกตามนัดไหม
+   - หากใช่: ให้แจ้งเรื่องนัดหมายหรือวัตถุประสงค์การโทร และสอบถามความสะดวก
 2. การตอบรับของลูกค้า:
-   - กรณี "สะดวก/มาตามนัด/สนใจ": กล่าวขอบคุณ แจ้งข้อควรปฏิบัติหรือรายละเอียดสั้นๆ และอวยพร ปิดการสนทนา
+   - กรณี "สะดวก/มาตามนัด/สนใจ": กล่าวขอบคุณ แจ้งรายละเอียดหรือข้อควรปฏิบัติสั้นๆ และอวยพร ปิดการสนทนา
    - กรณี "ไม่สะดวก/ขอเลื่อน": ถามลูกค้าทันทีว่าสะดวกเลื่อนเป็นวันไหนและช่วงเวลากี่โมง เมื่อลูกค้าแจ้ง ให้ทวนวันเวลาใหม่และบันทึก
    - กรณี "ขอยกเลิก/ไม่สนใจ": ถามเหตุผลสั้นๆ แสดงความเข้าใจและเสียดาย บันทึกยกเลิก
 3. เมื่อบทสนทนาสิ้นสุด ให้จบสายอย่างสุภาพ
 
-{f"คำแนะนำเพิ่มเติมเฉพาะทางธุรกิจ: {custom_instructions}" if custom_instructions else ""}
+{f"คำแนะนำเฉพาะสำหรับสายนี้: {custom_instructions}" if custom_instructions else ""}
 
 กฎการตอบ:
 ให้คุณตอบเป็น JSON Format เท่านั้น โดยมีโครงสร้างดังนี้:
 {{
   "speech": "ข้อความที่ AI จะพูดออกมาให้ลูกค้าฟัง (ภาษาไทย ไม่ใส่เครื่องหมายพิเศษ)",
   "call_status": "in_progress" หรือ "ended",
-  "appointment_outcome": "มาตามนัด" หรือ "ขอเลื่อนนัด" หรือ "ยกเลิกนัด" หรือ "โทรผิดเบอร์/ไม่ใช่เจ้าของ",
+  "appointment_outcome": "มาตามนัด" หรือ "ขอเลื่อนนัด" หรือ "ยกเลิกนัด" หรือ "สนใจโปรโมชั่น" หรือ "โทรผิดเบอร์/ไม่ใช่เจ้าของ",
   "has_new_date": "ใช่" หรือ "ไม่ใช่" หรือ "-",
   "new_date_info": "รายละเอียดวันเวลาใหม่ (ถ้ามี)",
   "summary": "สรุปผลการโทรสั้นๆ 1-2 ประโยคสำหรับเจ้าหน้าที่"
@@ -387,7 +483,7 @@ def generate_system_prompt(profile: dict) -> str:
     return prompt
 
 # -------------------------------------------------------------
-# 7. Endpoints: Audio & Dashboard
+# 8. Endpoints: Audio & Dashboard
 # -------------------------------------------------------------
 @app.get("/audio/{filename}")
 async def get_audio(filename: str):
@@ -402,7 +498,7 @@ async def get_dashboard_data():
     answered = len([c for c in calls_db if "สำเร็จ" in c["status"]]) + 18
     unanswered = len([c for c in calls_db if "ไม่สำเร็จ" in c["status"]])
     
-    attended = len([c for c in calls_db if c["appointment_outcome"] == "มาตามนัด"]) + 6
+    attended = len([c for c in calls_db if c["appointment_outcome"] in ["มาตามนัด", "สนใจโปรโมชั่น"]]) + 6
     rescheduled = len([c for c in calls_db if c["appointment_outcome"] == "ขอเลื่อนนัด"]) + 3
     cancelled = len([c for c in calls_db if c["appointment_outcome"] in ["ยกเลิกนัด", "โทรผิดเบอร์/ไม่ใช่เจ้าของ"]]) + 1
 
@@ -423,11 +519,12 @@ async def get_dashboard_data():
         },
         "calls": calls_db,
         "active_business": active_business,
-        "current_user": current_user
+        "current_user": current_user,
+        "scripts_count": len(SCRIPTS_DB)
     }
 
 # -------------------------------------------------------------
-# 8. Endpoints: Business Profile Engine
+# 9. Endpoints: Business Profile Engine & Persistence Fix
 # -------------------------------------------------------------
 @app.get("/api/business_profiles")
 async def get_business_profiles():
@@ -449,19 +546,59 @@ async def select_business_profile(data: dict):
 async def update_business_profile(data: dict):
     global active_business
     for key in ["name", "industry", "description", "agent_name", "agent_gender", "voice_id", "speed", "tone", "opening_text", "default_detail", "custom_instructions"]:
-        if key in data:
+        if key in data and data[key] is not None:
             active_business[key] = data[key]
-    return {"success": True, "active_profile": active_business}
+    return {"success": True, "active_profile": active_business, "message": "อัปเดตการตั้งค่าธุรกิจและเสียงสำเร็จ"}
 
 # -------------------------------------------------------------
-# 9. Endpoint: Voice Preview
+# 10. Endpoints: Multi-Script Library
+# -------------------------------------------------------------
+@app.get("/api/scripts")
+async def list_scripts():
+    return {"scripts": SCRIPTS_DB}
+
+@app.post("/api/scripts")
+async def save_or_create_script(data: dict):
+    script_id = data.get("id") or f"script_{uuid.uuid4().hex[:6]}"
+    existing = next((s for s in SCRIPTS_DB if s["id"] == script_id), None)
+    
+    script_entry = {
+        "id": script_id,
+        "name": data.get("name", "สคริปต์ใหม่"),
+        "business_name": data.get("business_name", active_business.get("name", "ศูนย์บริการ")),
+        "industry": data.get("industry", active_business.get("industry", "ทั่วไป")),
+        "agent_name": data.get("agent_name", active_business.get("agent_name", "เจ้าหน้าที่ AI")),
+        "agent_gender": data.get("agent_gender", active_business.get("agent_gender", "female")),
+        "voice_id": data.get("voice_id", active_business.get("voice_id", "th-TH-PremwadeeNeural")),
+        "tone": data.get("tone", "Friendly"),
+        "speed": float(data.get("speed", 1.0)),
+        "opening_text": data.get("opening_text", "สวัสดีค่ะ ขอเรียนสายคุณ{customer_name} ค่ะ สะดวกคุยสักครู่ไหมคะ"),
+        "objective": data.get("objective", "ติดต่อบริการลูกค้า"),
+        "custom_instructions": data.get("custom_instructions", "")
+    }
+    
+    if existing:
+        existing.update(script_entry)
+    else:
+        SCRIPTS_DB.insert(0, script_entry)
+        
+    return {"success": True, "script": script_entry}
+
+@app.delete("/api/scripts/{script_id}")
+async def delete_script(script_id: str):
+    global SCRIPTS_DB
+    SCRIPTS_DB = [s for s in SCRIPTS_DB if s["id"] != script_id]
+    return {"success": True}
+
+# -------------------------------------------------------------
+# 11. Endpoint: Voice Preview
 # -------------------------------------------------------------
 @app.post("/api/preview_voice")
 async def preview_voice(data: dict):
-    voice_id = data.get("voice_id", active_business.get("voice_id", "th-TH-PremwadeeNeural"))
+    voice_id = data.get("voice_id") or active_business.get("voice_id", "th-TH-PremwadeeNeural")
     speed = float(data.get("speed", active_business.get("speed", 1.0)))
-    agent_name = data.get("agent_name", active_business.get("agent_name", "เจ้าหน้าที่ AI"))
-    biz_name = data.get("name", active_business.get("name", "ศูนย์บริการ"))
+    agent_name = data.get("agent_name") or active_business.get("agent_name", "เจ้าหน้าที่ AI")
+    biz_name = data.get("name") or active_business.get("name", "ศูนย์บริการ")
     
     sample_text = data.get(
         "text",
@@ -472,7 +609,7 @@ async def preview_voice(data: dict):
     return {"audio_url": audio_url, "text": sample_text, "voice_id": voice_id}
 
 # -------------------------------------------------------------
-# 10. Endpoints: PromptPay Wallet & Credits
+# 12. Endpoints: PromptPay Wallet & Credits
 # -------------------------------------------------------------
 @app.get("/api/credits")
 async def get_credits():
@@ -537,7 +674,7 @@ async def confirm_topup(data: dict):
     }
 
 # -------------------------------------------------------------
-# 11. Endpoints: RBAC & User Management
+# 13. Endpoints: RBAC & User Management
 # -------------------------------------------------------------
 @app.get("/api/users")
 async def list_users():
@@ -578,25 +715,39 @@ async def add_or_update_user(data: dict):
     return {"success": True, "user": new_user}
 
 # -------------------------------------------------------------
-# 12. Endpoints: Customer Queue & Scheduler
+# 14. Endpoints: Customer Queue & Per-Call Script Assignment
 # -------------------------------------------------------------
 @app.get("/api/customers")
 async def get_customers_queue():
-    return {"queue": customers_queue}
+    return {"queue": customers_queue, "scripts": SCRIPTS_DB}
 
 @app.post("/api/customers")
 async def add_customer_to_queue(data: dict):
+    script_id = data.get("script_id") or "script_clinic_confirm"
+    matched_script = next((s for s in SCRIPTS_DB if s["id"] == script_id), None)
+    default_detail = matched_script["objective"] if matched_script else "ประสานงานบริการลูกค้า"
+    
     new_item = {
         "id": f"queue-{uuid.uuid4().hex[:6]}",
         "name": data.get("name", "คุณลูกค้า"),
         "phone": data.get("phone", "081-000-0000"),
-        "detail": data.get("detail", active_business.get("default_detail", "นัดหมายเข้ารับบริการ")),
+        "script_id": script_id,
+        "detail": data.get("detail", default_detail),
         "scheduled_time": data.get("scheduled_time", "วันนี้ 15:00 น."),
         "status": data.get("status", "รอโทรตามเวลา"),
         "attempts": 0
     }
     customers_queue.insert(0, new_item)
     return {"success": True, "customer": new_item}
+
+@app.put("/api/customers/{customer_id}/script")
+async def update_customer_script(customer_id: str, data: dict):
+    script_id = data.get("script_id")
+    cust = next((c for c in customers_queue if c["id"] == customer_id), None)
+    if cust and script_id:
+        cust["script_id"] = script_id
+        return {"success": True, "customer": cust}
+    return JSONResponse(status_code=400, content={"error": "Customer or script not found"})
 
 @app.delete("/api/customers/{customer_id}")
 async def delete_customer_from_queue(customer_id: str):
@@ -605,7 +756,7 @@ async def delete_customer_from_queue(customer_id: str):
     return {"success": True}
 
 # -------------------------------------------------------------
-# 13. Endpoints: Call Center Simulator (Live Gemini Integration)
+# 15. Endpoints: Call Center Simulator (Per-Call Dynamic Script)
 # -------------------------------------------------------------
 @app.post("/api/start_call")
 async def start_call(data: dict):
@@ -614,27 +765,43 @@ async def start_call(data: dict):
         
     customer_name = data.get("name") or "คุณลูกค้า"
     customer_phone = data.get("phone", "093-340-9929")
-    appointment_detail = data.get("detail") or active_business.get("default_detail", "นัดหมายบริการ")
+    script_id = data.get("script_id")
     
+    # Resolve the active script for this call
+    active_script = None
+    if script_id:
+        active_script = next((s for s in SCRIPTS_DB if s["id"] == script_id), None)
+    if not active_script:
+        active_script = {
+            "name": active_business.get("name", "ศูนย์บริการ"),
+            "business_name": active_business.get("name", "ศูนย์บริการ"),
+            "agent_name": active_business.get("agent_name", "เจ้าหน้าที่ AI"),
+            "agent_gender": active_business.get("agent_gender", "female"),
+            "voice_id": active_business.get("voice_id", "th-TH-PremwadeeNeural"),
+            "tone": active_business.get("tone", "Friendly"),
+            "speed": active_business.get("speed", 1.0),
+            "opening_text": active_business.get("opening_text", "สวัสดีค่ะ ขอเรียนสายคุณ{customer_name} ค่ะ สะดวกคุยสักครู่ไหมคะ"),
+            "objective": data.get("detail") or active_business.get("default_detail", "นัดหมายบริการ"),
+            "custom_instructions": active_business.get("custom_instructions", "")
+        }
+        
+    appointment_detail = data.get("detail") or active_script.get("objective", "นัดหมายบริการ")
     session_id = uuid.uuid4().hex[:10]
     
-    opening_template = active_business.get(
-        "opening_text",
-        "สวัสดีค่ะ ขอเรียนสายคุณ{customer_name} จาก{business_name} ค่ะ สะดวกคุยสักครู่ไหมคะ"
-    )
+    opening_template = active_script.get("opening_text", "สวัสดีค่ะ ขอเรียนสายคุณ{customer_name} ค่ะ สะดวกคุยสักครู่ไหมคะ")
     opening_text = opening_template.format(
         customer_name=customer_name,
-        business_name=active_business.get("name", "ศูนย์บริการ")
+        business_name=active_script.get("business_name", "ศูนย์บริการ")
     )
     
     audio_url = await synthesize_speech(
         opening_text,
-        voice_id=active_business.get("voice_id"),
-        speed=float(active_business.get("speed", 1.0)),
+        voice_id=active_script.get("voice_id"),
+        speed=float(active_script.get("speed", 1.0)),
         filename_prefix="open"
     )
     
-    system_prompt = generate_system_prompt(active_business)
+    system_prompt = generate_system_prompt_from_script(active_script)
     chat_session = None
     
     if client:
@@ -649,7 +816,7 @@ async def start_call(data: dict):
             )
             init_instruction = (
                 f"ข้อมูลเป้าหมาย: ชื่อลูกค้า={customer_name}, เบอร์={customer_phone}, "
-                f"นัดเดิม={appointment_detail}. ประโยคเปิดสายที่คุณพูดออกไปแล้วคือ: \"{opening_text}\". "
+                f"รายละเอียด={appointment_detail}. ประโยคเปิดสายที่คุณพูดออกไปแล้วคือ: \"{opening_text}\". "
                 f"จงเตรียมพร้อมรับคำตอบจากลูกค้าและตอบกลับในรูปแบบ JSON ตามคำสั่ง"
             )
             chat_session.send_message(init_instruction)
@@ -661,6 +828,7 @@ async def start_call(data: dict):
         "customer_name": customer_name,
         "customer_phone": customer_phone,
         "appointment_detail": appointment_detail,
+        "active_script": active_script,
         "chat_session": chat_session,
         "created_at": datetime.now(),
         "transcript": [{"speaker": "AI", "text": opening_text, "audio": audio_url}]
@@ -671,8 +839,10 @@ async def start_call(data: dict):
         "speech": opening_text,
         "audio_url": audio_url,
         "call_status": "in_progress",
-        "business_name": active_business.get("name"),
-        "agent_name": active_business.get("agent_name")
+        "business_name": active_script.get("business_name"),
+        "agent_name": active_script.get("agent_name"),
+        "agent_gender": active_script.get("agent_gender", "female"),
+        "script_name": active_script.get("name")
     }
 
 @app.post("/api/chat")
@@ -685,6 +855,7 @@ async def chat(data: dict):
         return JSONResponse(status_code=400, content={"error": "Session not found"})
     
     session = active_sessions[session_id]
+    active_script = session.get("active_script", active_business)
     session["transcript"].append({"speaker": "Customer", "text": user_speech, "audio": None})
     
     result = None
@@ -699,7 +870,7 @@ async def chat(data: dict):
             
     if not result:
         # High-precision Rule Fallback
-        if any(w in user_speech for w in ["ผิดเบอร์", "ไม่ใช่", "โทรผิด", "ผู้ชาย"]):
+        if any(w in user_speech for w in ["ผิดเบอร์", "ไม่ใช่", "โทรผิด", "ผู้ชาย", "ไม่ใช่เบอร์"]):
             result = {
                 "speech": "กราบขออภัยเป็นอย่างยิ่งค่ะ น่าจะมีการบันทึกเบอร์โทรศัพท์ผิดพลาด ขออนุญาตวางสายนะคะ ขอบคุณค่ะ",
                 "call_status": "ended",
@@ -707,17 +878,17 @@ async def chat(data: dict):
                 "has_new_date": "ไม่ใช่",
                 "summary": "โทรติดแต่ปลายสายแจ้งว่าไม่ใช่บุคคลเป้าหมายหรือโทรผิดเบอร์ AI จึงขออภัยและวางสาย"
             }
-        elif any(w in user_speech for w in ["สะดวก", "มาตามนัด", "เจอกัน", "โอเค", "ไปได้"]):
+        elif any(w in user_speech for w in ["สะดวก", "มาตามนัด", "เจอกัน", "โอเค", "ไปได้", "สนใจ"]):
             result = {
-                "speech": f"ขอบพระคุณมากค่ะ ทาง{active_business.get('name')} ได้บันทึกการยืนยันนัดหมายเรียบร้อยแล้วค่ะ แล้วพบกันตามนัดนะคะ สวัสดีค่ะ",
+                "speech": f"ขอบพระคุณมากค่ะ ทาง{active_script.get('business_name')} ได้บันทึกการยืนยันเรียบร้อยแล้วค่ะ แล้วพบกันนะคะ สวัสดีค่ะ",
                 "call_status": "ended",
-                "appointment_outcome": "มาตามนัด",
+                "appointment_outcome": "มาตามนัด" if "สนใจ" not in user_speech else "สนใจโปรโมชั่น",
                 "has_new_date": "-",
-                "summary": "ลูกค้ายืนยันสะดวกเข้ารับบริการตามวันและเวลาที่กำหนดเดิม"
+                "summary": "ลูกค้ายืนยันสะดวกเข้ารับบริการตามวันและเวลาที่กำหนด หรือแสดงความสนใจข้อเสนอ"
             }
         elif any(w in user_speech for w in ["เลื่อน", "ไม่ว่าง", "ติดธุระ", "วันศุกร์", "วันอื่น"]):
             result = {
-                "speech": "รับทราบค่ะ ได้บันทึกคำขอเลื่อนนัดหมายลงในระบบเรียบร้อยแล้วนะคะ ทางเจ้าหน้าที่จะส่ง SMS ยืนยันคิวใหม่อีกครั้งค่ะ ขอบคุณค่ะ",
+                "speech": "รับทราบค่ะ ได้บันทึกคำขอเลื่อนนัดหมายลงในระบบเรียบร้อยแล้วนะคะ ทางเจ้าหน้าที่จะส่งข้อความยืนยันคิวใหม่อีกครั้งค่ะ ขอบคุณค่ะ",
                 "call_status": "ended",
                 "appointment_outcome": "ขอเลื่อนนัด",
                 "has_new_date": "ใช่",
@@ -725,7 +896,7 @@ async def chat(data: dict):
             }
         else:
             result = {
-                "speech": "รับทราบข้อมูลค่ะ มีข้อมูลส่วนอื่นให้สอบถามเพิ่มเติมไหมคะ หรือสะดวกเข้ารับบริการตามนัดหมายนี้เลยไหมคะ",
+                "speech": "รับทราบข้อมูลค่ะ มีข้อมูลส่วนอื่นให้สอบถามเพิ่มเติมไหมคะ หรือสะดวกตามรายละเอียดนี้เลยไหมคะ",
                 "call_status": "in_progress",
                 "appointment_outcome": "รอผล",
                 "has_new_date": "-",
@@ -740,8 +911,8 @@ async def chat(data: dict):
     
     audio_url = await synthesize_speech(
         ai_speech,
-        voice_id=active_business.get("voice_id"),
-        speed=float(active_business.get("speed", 1.0)),
+        voice_id=active_script.get("voice_id"),
+        speed=float(active_script.get("speed", 1.0)),
         filename_prefix="turn"
     )
     session["transcript"].append({"speaker": "AI", "text": ai_speech, "audio": audio_url})
@@ -759,6 +930,7 @@ async def chat(data: dict):
             "id": f"call-{uuid.uuid4().hex[:6]}",
             "name": session["customer_name"],
             "phone": session["customer_phone"],
+            "script_name": active_script.get("name", "สคริปต์มาตรฐาน"),
             "job_ref": f"{datetime.now().strftime('%Y%m%d')}_AI",
             "time": datetime.now().strftime("%d %b %H:%M"),
             "status": "สำเร็จแล้ว",

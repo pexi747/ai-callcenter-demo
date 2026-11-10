@@ -44,6 +44,10 @@
           <span class="mr-3 text-base">📊</span> แดชบอร์ด & รายงาน
         </button>
 
+        <button onclick="switchTab('scripts')" id="tab-btn-scripts" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
+          <span class="mr-3 text-base">📜</span> คลังชุดสคริปต์ (Scripts)
+        </button>
+
         <button onclick="switchTab('business')" id="tab-btn-business" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
           <span class="mr-3 text-base">🏢</span> ตั้งค่าธุรกิจ (Core Business)
         </button>
@@ -93,7 +97,7 @@
   <!-- MAIN VIEWPORT -->
   <main class="flex-1 flex flex-col overflow-y-auto">
     
-    <!-- Top Navigation Header with Role Switcher & Live Actions -->
+    <!-- Top Navigation Header -->
     <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-30">
       <div class="flex items-center space-x-3">
         <span id="header-title" class="font-bold text-slate-800 text-base">Campaign Report</span>
@@ -126,14 +130,19 @@
       </div>
     </header>
 
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-banner" class="fixed top-16 right-6 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl z-50 transition-all duration-300 transform translate-y-[-100px] opacity-0 flex items-center space-x-2">
+      <span id="toast-icon">✅</span>
+      <span id="toast-msg">บันทึกข้อมูลเรียบร้อย</span>
+    </div>
+
     <!-- CONTENT TABS CONTAINER -->
     <div class="p-6">
 
       <!-- ============================================================== -->
-      <!-- TAB 1: CAMPAIGN DASHBOARD (Reference UI) -->
+      <!-- TAB 1: CAMPAIGN DASHBOARD -->
       <!-- ============================================================== -->
       <section id="tab-dashboard" class="space-y-6">
-        <!-- Header Filters -->
         <div class="flex justify-between items-center">
           <div>
             <h2 class="text-xl font-bold text-slate-800">รายงานการโทรประจำวัน</h2>
@@ -147,7 +156,7 @@
           </div>
         </div>
 
-        <!-- Metric Cards Row -->
+        <!-- Metric Cards -->
         <div class="grid grid-cols-4 gap-4">
           <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
             <p class="text-xs text-slate-500 font-medium">ทั้งหมดที่ต้องโทร</p>
@@ -200,100 +209,23 @@
           </div>
         </div>
 
-        <!-- Outcomes Breakdown -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow">
-            <h3 class="font-bold text-slate-800 text-sm mb-3">เคสการติดตาม</h3>
-            <div class="grid grid-cols-3 gap-3">
-              <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <p class="text-xs text-slate-500">เคสที่ต้องติดตาม</p>
-                <p class="text-2xl font-bold text-slate-900 mt-1">6</p>
-                <p class="text-[11px] text-amber-600 mt-1">ค้างเกิน 24 ชม.: 6</p>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <p class="text-xs text-slate-500">เคสที่ปิดแล้ว</p>
-                <p class="text-2xl font-bold text-slate-900 mt-1">0</p>
-                <p class="text-[11px] text-slate-400 mt-1">สำเร็จสมบูรณ์</p>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <p class="text-xs text-slate-500">เคสที่โทรไม่สำเร็จ</p>
-                <p class="text-2xl font-bold text-rose-600 mt-1">1</p>
-                <p class="text-[11px] text-slate-400 mt-1">ยังไม่เปิดสาย</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow">
-            <h3 class="font-bold text-slate-800 text-sm mb-3">ผลลัพธ์การสนทนา</h3>
-            <div class="grid grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <div class="flex justify-between text-xs text-slate-600 font-medium">
-                  <span>ผลการนัด</span>
-                  <span class="text-slate-400">ตอบ 12 จาก 21</span>
-                </div>
-                <div class="space-y-1.5 text-xs">
-                  <div class="flex items-center justify-between">
-                    <span class="w-16 text-slate-600">มาตามนัด</span>
-                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div style="width: 58%;" class="h-full bg-blue-600"></div>
-                    </div>
-                    <span id="num-attended" class="font-bold text-slate-700 w-4 text-right">7</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="w-16 text-slate-600">ขอเลื่อนนัด</span>
-                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div style="width: 33%;" class="h-full bg-blue-500"></div>
-                    </div>
-                    <span id="num-rescheduled" class="font-bold text-slate-700 w-4 text-right">4</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="w-16 text-slate-600">ยกเลิกนัด</span>
-                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div style="width: 10%;" class="h-full bg-blue-400"></div>
-                    </div>
-                    <span id="num-cancelled" class="font-bold text-slate-700 w-4 text-right">1</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <div class="flex justify-between text-xs text-slate-600 font-medium">
-                  <span>ได้วันเวลานัดใหม่</span>
-                  <span class="text-slate-400">ตอบ 5 จาก 21</span>
-                </div>
-                <div class="space-y-1.5 text-xs">
-                  <div class="flex items-center justify-between">
-                    <span class="w-16 text-slate-600">ใช่</span>
-                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div style="width: 60%;" class="h-full bg-indigo-600"></div>
-                    </div>
-                    <span class="font-bold text-slate-700 w-4 text-right">3</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="w-16 text-slate-600">ไม่ใช่</span>
-                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div style="width: 40%;" class="h-full bg-indigo-400"></div>
-                    </div>
-                    <span class="font-bold text-slate-700 w-4 text-right">2</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Call Out History Table -->
         <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-            <h3 class="font-bold text-slate-800 text-base">ผลการโทรล่าสุด (Call Out History)</h3>
-            <span class="text-xs text-slate-500">บันทึกเสียงและถอดเทปสนทนาเรียลไทม์ (หัก 1 เครดิต/สาย)</span>
+            <div>
+              <h3 class="font-bold text-slate-800 text-base">ผลการโทรล่าสุด (Call Out History)</h3>
+              <p class="text-xs text-slate-400">บันทึกเสียงและถอดเทปสนทนาเรียลไทม์ (หัก 1 เครดิต/สาย)</p>
+            </div>
+            <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+              ⚡ รองรับ Barge-In (หยุดฟังเมื่อลูกค้าพูดแทรก)
+            </span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-50/80 text-xs text-slate-500 font-semibold border-b border-slate-200">
                   <th class="py-3 px-4">ชื่อ / เบอร์</th>
-                  <th class="py-3 px-4">Job / Ref</th>
+                  <th class="py-3 px-4">ชุดสคริปต์ที่ใช้</th>
                   <th class="py-3 px-4">สถานะ / เวลาคุย</th>
                   <th class="py-3 px-4">ผลการนัด</th>
                   <th class="py-3 px-4">ได้วันเวลานัดใหม่</th>
@@ -310,41 +242,56 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 2: CORE BUSINESS CONFIGURATION -->
+      <!-- TAB 2: MULTI-SCRIPT LIBRARY (ชุดสคริปต์รายสาย) -->
+      <!-- ============================================================== -->
+      <section id="tab-scripts" class="space-y-6 hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">คลังชุดสคริปต์การโทร (Multi-Script Library)</h2>
+            <p class="text-xs text-slate-500">สร้างและกำหนดชุดสคริปต์ได้หลายแบบ เช่น คอนเฟิร์มนัดหมาย, แจ้งโปรโมชั่น, แจ้งรถซ่อมเสร็จ, สำรวจความพึงพอใจ เพื่อนำไปเลือกใช้ในแต่ละสายได้อิสระ</p>
+          </div>
+          <button onclick="openCreateScriptModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition">
+            <span>+</span> <span>สร้างชุดสคริปต์ใหม่</span>
+          </button>
+        </div>
+
+        <!-- Script Cards Grid -->
+        <div id="grid-scripts" class="grid grid-cols-3 gap-4">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 3: CORE BUSINESS CONFIGURATION -->
       <!-- ============================================================== -->
       <section id="tab-business" class="space-y-6 hidden">
         <div>
-          <h2 class="text-xl font-bold text-slate-800">ตั้งค่าธุรกิจ (Core Business Setup)</h2>
-          <p class="text-xs text-slate-500">เลือกประเภทธุรกิจและระบุข้อมูลเฉพาะทาง เพื่อให้ AI สวมบทบาทและใช้ภาษาตรงกับอุตสาหกรรมของคุณ</p>
+          <h2 class="text-xl font-bold text-slate-800">ตั้งค่าธุรกิจหลัก (Core Business Setup)</h2>
+          <p class="text-xs text-slate-500">เลือกประเภทธุรกิจและระบุข้อมูลเฉพาะทาง เพื่อให้ AI สวมบทบาทและใช้ภาษาตรงกับอุตสาหกรรมของคุณ (มีผลทันทีไม่ต้องรีเฟรช)</p>
         </div>
 
         <!-- Industry Template Cards -->
         <div class="grid grid-cols-5 gap-3">
-          <!-- Clinic -->
-          <div onclick="selectIndustryTemplate('clinic')" id="card-tmpl-clinic" class="bg-white p-4 rounded-xl border-2 border-blue-600 bg-blue-50/30 cursor-pointer hover:shadow-md transition card-shadow">
+          <div onclick="selectIndustryTemplate('clinic')" id="card-tmpl-clinic" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
             <span class="text-2xl block mb-2">🏥</span>
             <h4 class="font-bold text-slate-800 text-xs">คลินิกความงาม</h4>
             <p class="text-[11px] text-slate-500 mt-1">ยืนยันคิวตรวจผิว, เตือนงดแดด, เลเซอร์</p>
           </div>
-          <!-- Automotive -->
           <div onclick="selectIndustryTemplate('automotive')" id="card-tmpl-automotive" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
             <span class="text-2xl block mb-2">🚗</span>
             <h4 class="font-bold text-slate-800 text-xs">อู่ & ศูนย์บริการยนต์</h4>
             <p class="text-[11px] text-slate-500 mt-1">เตือนเช็คระยะ, แจ้งซ่อมเสร็จ, เปลี่ยนถ่ายน้ำมัน</p>
           </div>
-          <!-- Real Estate -->
           <div onclick="selectIndustryTemplate('realestate')" id="card-tmpl-realestate" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
             <span class="text-2xl block mb-2">🏙️</span>
             <h4 class="font-bold text-slate-800 text-xs">อสังหาริมทรัพย์</h4>
             <p class="text-[11px] text-slate-500 mt-1">นัดชมห้องตัวอย่าง, โปรพรีเซล, ส่วนลดเงินสด</p>
           </div>
-          <!-- Dental -->
           <div onclick="selectIndustryTemplate('dental')" id="card-tmpl-dental" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
             <span class="text-2xl block mb-2">🦷</span>
             <h4 class="font-bold text-slate-800 text-xs">คลินิกทันตกรรม</h4>
             <p class="text-[11px] text-slate-500 mt-1">เตือนนัดขูดหินปูน 6 เดือน, ประกันสังคมทำฟัน</p>
           </div>
-          <!-- Custom -->
           <div onclick="selectIndustryTemplate('custom')" id="card-tmpl-custom" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
             <span class="text-2xl block mb-2">⚙️</span>
             <h4 class="font-bold text-slate-800 text-xs">ธุรกิจกำหนดเอง</h4>
@@ -396,16 +343,15 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 3: AI VOICE CONFIGURATION -->
+      <!-- TAB 4: AI VOICE CONFIGURATION -->
       <!-- ============================================================== -->
       <section id="tab-voice" class="space-y-6 hidden">
         <div>
           <h2 class="text-xl font-bold text-slate-800">เสียงพูด AI (Voice & Personality Tone)</h2>
-          <p class="text-xs text-slate-500">เลือกเพศเสียงภาษาไทย ปรับโทนความเร็ว และทดลองฟังเสียงสังเคราะห์เสมือนคนจริง</p>
+          <p class="text-xs text-slate-500">เลือกเพศเสียงภาษาไทย ปรับโทนความเร็ว และทดลองฟังเสียงสังเคราะห์ (บันทึกค่าลงเซิร์ฟเวอร์ทันที)</p>
         </div>
 
         <div class="grid grid-cols-2 gap-6">
-          <!-- Voice Selector -->
           <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow space-y-5">
             <h3 class="font-bold text-slate-800 text-sm">1. เลือกเพศและโมเดลเสียงภาษาไทย</h3>
 
@@ -480,16 +426,16 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 4: CUSTOMER QUEUE & SCHEDULER -->
+      <!-- TAB 5: CUSTOMER QUEUE & SCHEDULER -->
       <!-- ============================================================== -->
       <section id="tab-queue" class="space-y-6 hidden">
         <div class="flex justify-between items-center">
           <div>
-            <h2 class="text-xl font-bold text-slate-800">คิวโทรและตั้งเวลาโทรออก (Outbound Queue)</h2>
-            <p class="text-xs text-slate-500">นำเข้ารายชื่อลูกค้า กำหนดวันเวลาโทรออกล่วงหน้า หรือสั่งโทรทันที</p>
+            <h2 class="text-xl font-bold text-slate-800">คิวโทรและกำหนดชุดสคริปต์รายสาย (Outbound Queue)</h2>
+            <p class="text-xs text-slate-500">กำหนดว่าแต่ละสายจะใช้สคริปต์ชุดใด (เช่น สคริปต์ตรวจเช็คระยะ หรือสคริปต์แจ้งซ่อมเสร็จ) พร้อมกำหนดเวลาโทรออก</p>
           </div>
           <button onclick="openAddCustomerModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition">
-            <span>+</span> <span>เพิ่มรายชื่อลูกค้า</span>
+            <span>+</span> <span>เพิ่มรายชื่อลูกค้าเข้าคิว</span>
           </button>
         </div>
 
@@ -500,7 +446,7 @@
                 <tr class="bg-slate-50/80 text-xs text-slate-500 font-semibold border-b border-slate-200">
                   <th class="py-3 px-4">ชื่อลูกค้า</th>
                   <th class="py-3 px-4">เบอร์โทรศัพท์</th>
-                  <th class="py-3 px-4">รายละเอียด / วัตถุประสงค์</th>
+                  <th class="py-3 px-4">ชุดสคริปต์ที่กำหนดให้โทร</th>
                   <th class="py-3 px-4">กำหนดเวลาโทรออก</th>
                   <th class="py-3 px-4">สถานะคิว</th>
                   <th class="py-3 px-4 text-center">จัดการ</th>
@@ -515,7 +461,7 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 5: PROMPTPAY WALLET & CREDIT TOP-UP -->
+      <!-- TAB 6: PROMPTPAY WALLET -->
       <!-- ============================================================== -->
       <section id="tab-wallet" class="space-y-6 hidden">
         <div>
@@ -523,7 +469,6 @@
           <p class="text-xs text-slate-500">เติมเครดิตการโทรอัตโนมัติด้วย QR Code พร้อมเพย์มาตรฐาน EMVCo สแกนจ่ายผ่าน Mobile Banking ได้ทุกธนาคาร</p>
         </div>
 
-        <!-- Current Balance Banner -->
         <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center">
           <div>
             <span class="text-blue-200 text-xs font-medium">ยอดเครดิตคงเหลือของคุณ</span>
@@ -540,9 +485,8 @@
           </div>
         </div>
 
-        <!-- Package Grid -->
+        <!-- Packages -->
         <div class="grid grid-cols-4 gap-4">
-          <!-- 100 -->
           <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between hover:border-blue-500 transition">
             <div>
               <span class="text-xs font-semibold text-slate-500">แพ็กเกจทดลอง</span>
@@ -555,7 +499,6 @@
             </button>
           </div>
 
-          <!-- 300 Popular -->
           <div class="bg-white p-5 rounded-xl border-2 border-blue-600 card-shadow flex flex-col justify-between relative shadow-md">
             <span class="absolute -top-2.5 right-4 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
               ยอดนิยม
@@ -571,7 +514,6 @@
             </button>
           </div>
 
-          <!-- 500 -->
           <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between hover:border-blue-500 transition">
             <div>
               <span class="text-xs font-semibold text-slate-500">แพ็กเกจธุรกิจ</span>
@@ -584,7 +526,6 @@
             </button>
           </div>
 
-          <!-- 1000 -->
           <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between hover:border-blue-500 transition">
             <div>
               <span class="text-xs font-semibold text-slate-500">แพ็กเกจองค์กร</span>
@@ -598,7 +539,7 @@
           </div>
         </div>
 
-        <!-- Transaction History -->
+        <!-- Transactions -->
         <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-200">
             <h3 class="font-bold text-slate-800 text-sm">ประวัติการทำรายการเติมเครดิต (Payment History)</h3>
@@ -623,7 +564,7 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 6: RBAC & USER MANAGEMENT -->
+      <!-- TAB 7: RBAC & USER MANAGEMENT -->
       <!-- ============================================================== -->
       <section id="tab-users" class="space-y-6 hidden">
         <div class="flex justify-between items-center">
@@ -661,6 +602,111 @@
   </main>
 
   <!-- ============================================================== -->
+  <!-- MODAL: CREATE SCRIPT SET (สร้างชุดสคริปต์ใหม่) -->
+  <!-- ============================================================== -->
+  <div id="modal-create-script" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 overflow-hidden p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-800 text-base">สร้างชุดสคริปต์การโทรใหม่ (New Script Set)</h3>
+        <button onclick="closeCreateScriptModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อชุดสคริปต์ (Script Name)</label>
+          <input type="text" id="script-name" placeholder="เช่น อู่ยนต์: แจ้งเปลี่ยนผ้าเบรกและราคา" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อธุรกิจ / องค์กร</label>
+            <input type="text" id="script-biz-name" placeholder="เช่น ออโต้ แคร์ เซอร์วิส" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ประเภทอุตสาหกรรม</label>
+            <input type="text" id="script-industry" placeholder="เช่น ยานยนต์, คลินิก, คอนโด" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อตัวแทน AI</label>
+            <input type="text" id="script-agent-name" placeholder="เช่น น้องนนท์" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">เพศของเสียง AI</label>
+            <select id="script-gender" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+              <option value="male">👨‍💼 ชาย (Niwat Neural - สุภาพ น่าเชื่อถือ)</option>
+              <option value="female">👩‍💼 หญิง (Premwadee Neural - สดใส นุ่มนวล)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ประโยคเปิดสายทักทาย</label>
+          <input type="text" id="script-opening" placeholder="สวัสดีครับ ขอเรียนสายคุณ{customer_name} จาก{business_name} ครับ..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">วัตถุประสงค์และสาระสำคัญของสาย</label>
+          <textarea id="script-objective" rows="2" placeholder="เช่น แจ้งยอดค่าเปลี่ยนผ้าเบรก 2,500 บาท และสอบถามว่าอนุมัติให้เปลี่ยนเลยหรือไม่..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">คำแนะนำเฉพาะทาง (ข้อพึงระวัง / ข้อเสนอพิเศษ)</label>
+          <textarea id="script-custom" rows="2" placeholder="เช่น มีส่วนลดค่าแรง 10% และรับประกันอะไหล่ 6 เดือน..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none"></textarea>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end space-x-2">
+        <button onclick="closeCreateScriptModal()" class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-xs font-semibold">
+          ยกเลิก
+        </button>
+        <button onclick="submitCreateScript()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700">
+          💾 บันทึกชุดสคริปต์
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: ADD CUSTOMER TO QUEUE -->
+  <!-- ============================================================== -->
+  <div id="modal-add-customer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-800 text-base">เพิ่มรายชื่อและกำหนดชุดสคริปต์รายสาย</h3>
+        <button onclick="closeAddCustomerModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อลูกค้า</label>
+          <input type="text" id="add-cust-name" placeholder="เช่น คุณวิภา สุวรรณ" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์</label>
+          <input type="text" id="add-cust-phone" placeholder="เช่น 089-123-4567" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชุดสคริปต์ที่ต้องการให้ AI ใช้โทร</label>
+          <select id="add-cust-script" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">กำหนดเวลาโทรออก (Scheduled Time)</label>
+          <input type="text" id="add-cust-time" placeholder="เช่น วันนี้ 15:30 น. หรือ ทันที" value="วันนี้ 16:30 น." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end space-x-2">
+        <button onclick="closeAddCustomerModal()" class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50">
+          ยกเลิก
+        </button>
+        <button onclick="submitAddCustomer()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700">
+          บันทึกเข้าคิว
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
   <!-- MODAL: PROMPTPAY QR PAYMENT -->
   <!-- ============================================================== -->
   <div id="modal-promptpay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
@@ -683,7 +729,6 @@
           </span>
         </div>
 
-        <!-- QR Code Container -->
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 inline-block shadow-inner">
           <img id="pp-qr-image" src="" alt="PromptPay QR Code" class="w-48 h-48 mx-auto rounded-lg">
         </div>
@@ -693,50 +738,9 @@
           <p>เลขอ้างอิง: <span id="pp-modal-ref" class="font-semibold text-slate-700">PP-20261110-001</span></p>
         </div>
 
-        <!-- Simulation Payment Button -->
         <button onclick="confirmPromptPaySimulation()" id="btn-confirm-pp" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-md transition flex items-center justify-center space-x-1.5">
           <span>✅</span>
           <span>จำลองการชำระเงินสำเร็จ (Instant Top-up)</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================== -->
-  <!-- MODAL: ADD CUSTOMER TO QUEUE -->
-  <!-- ============================================================== -->
-  <div id="modal-add-customer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden p-6 space-y-4">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-        <h3 class="font-bold text-slate-800 text-base">เพิ่มรายชื่อและตั้งเวลาโทรออก</h3>
-        <button onclick="closeAddCustomerModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อลูกค้า</label>
-          <input type="text" id="add-cust-name" placeholder="เช่น คุณวิภา สุวรรณ" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์</label>
-          <input type="text" id="add-cust-phone" placeholder="เช่น 089-123-4567" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">รายละเอียด / วัตถุประสงค์การโทร</label>
-          <input type="text" id="add-cust-detail" placeholder="เช่น ยืนยันนัดตรวจผิว วันพรุ่งนี้ 14:00 น." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">กำหนดเวลาโทรออก (Scheduled Time)</label>
-          <input type="text" id="add-cust-time" placeholder="เช่น วันนี้ 15:30 น. หรือ ทันที" value="วันนี้ 16:30 น." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
-        </div>
-      </div>
-
-      <div class="pt-2 flex justify-end space-x-2">
-        <button onclick="closeAddCustomerModal()" class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50">
-          ยกเลิก
-        </button>
-        <button onclick="submitAddCustomer()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700">
-          บันทึกเข้าคิว
         </button>
       </div>
     </div>
@@ -786,23 +790,33 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- MODAL: LIVE CALL SIMULATION (ADAPTIVE PERSONA) -->
+  <!-- MODAL: LIVE CALL SIMULATION (WITH REAL-TIME BARGE-IN) -->
   <!-- ============================================================== -->
   <div id="call-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
       
       <!-- Call Screen Header -->
-      <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 text-center relative">
+      <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-5 text-center relative">
         <button onclick="closeCallModal()" class="absolute top-4 right-4 text-white/70 hover:text-white text-lg font-bold">✕</button>
-        <div class="relative w-20 h-20 mx-auto mb-3">
+        
+        <!-- Script Selector on calling screen -->
+        <div class="max-w-xs mx-auto mb-2">
+          <select id="modal-select-script" onchange="onModalScriptChanged(this.value)" class="w-full bg-white/20 border border-white/40 text-white text-[11px] font-semibold rounded-lg px-2.5 py-1 focus:outline-none">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <div class="relative w-16 h-16 mx-auto mb-2">
           <div id="call-pulse" class="absolute inset-0 rounded-full bg-blue-400 opacity-50 pulse-ring hidden"></div>
-          <div id="call-avatar" class="w-20 h-20 rounded-full bg-white/20 border-2 border-white/60 flex items-center justify-center text-3xl font-bold shadow-lg">
+          <div id="call-avatar" class="w-16 h-16 rounded-full bg-white/20 border-2 border-white/60 flex items-center justify-center text-3xl font-bold shadow-lg">
             👩‍💼
           </div>
         </div>
-        <h3 id="modal-customer-name" class="font-bold text-lg">AI กำลังโทรหา คุณลูกค้า</h3>
+        <h3 id="modal-customer-name" class="font-bold text-base">AI กำลังโทรหา คุณลูกค้า</h3>
         <p id="modal-customer-phone" class="text-xs text-blue-200">093-340-9929 • สายตรงศูนย์บริการ</p>
-        <div id="modal-call-status" class="mt-2 inline-block bg-blue-900/60 text-blue-200 text-xs px-3 py-1 rounded-full font-medium">
+        
+        <!-- Status indicator including Barge-in state -->
+        <div id="modal-call-status" class="mt-2 inline-block bg-blue-900/60 text-blue-200 text-xs px-3 py-1 rounded-full font-medium transition-all">
           กำลังเตรียมสัญญาณ...
         </div>
       </div>
@@ -814,16 +828,21 @@
 
       <!-- Quick Preset Replies -->
       <div class="p-3 bg-slate-100 border-t border-slate-200 space-y-1.5">
-        <p class="text-[11px] text-slate-500 font-semibold">คลิกคำตอบตัวอย่าง หรือกดไมค์เพื่อพูด:</p>
+        <div class="flex justify-between items-center text-[11px] text-slate-500 font-semibold">
+          <span>คลิกคำตอบตัวอย่าง หรือกดไมค์เพื่อพูด:</span>
+          <span class="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 text-[10px]">
+            ⚡ พูดแทรกได้ตลอดเวลา
+          </span>
+        </div>
         <div class="flex flex-wrap gap-1.5">
           <button onclick="sendPresetText('ใช่ค่ะ กำลังพูดสายอยู่ สะดวกคุยค่ะ')" class="bg-white border border-slate-300 hover:bg-blue-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
             1. ยืนยันตัวตน (ใช่ค่ะ สะดวกคุย)
           </button>
-          <button onclick="sendPresetText('สะดวกไปตามนัดหมายเดิมแน่นอนค่ะ ขอบคุณค่ะ')" class="bg-white border border-slate-300 hover:bg-emerald-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
-            2. สะดวกมาตามนัด
+          <button onclick="sendPresetText('สะดวกตามรายละเอียดที่แจ้งเลยค่ะ ขอบคุณมากนะคะ')" class="bg-white border border-slate-300 hover:bg-emerald-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
+            2. สะดวกตามนัด/สนใจ
           </button>
           <button onclick="sendPresetText('ติดธุระด่วนเลยค่ะ ขอเลื่อนเป็นวันศุกร์บ่ายสองได้ไหมคะ')" class="bg-white border border-slate-300 hover:bg-amber-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
-            3. ขอเลื่อนนัด
+            3. ขอเลื่อนวันเวลา
           </button>
           <button onclick="sendPresetText('ขอโทษครับ โทรผิดเบอร์แล้วครับ ผมเป็นผู้ชาย')" class="bg-white border border-slate-300 hover:bg-rose-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
             4. โทรผิดเบอร์
@@ -831,12 +850,12 @@
         </div>
       </div>
 
-      <!-- Mic & Input Action Bar -->
+      <!-- Mic & Input Action Bar (Barge-In Hooked) -->
       <div class="p-4 bg-white border-t border-slate-200 flex items-center space-x-2">
-        <button id="btn-mic" onclick="toggleMic()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-lg border border-slate-300 shrink-0 transition" title="คลิกเพื่อเปิดไมค์พูด">
+        <button id="btn-mic" onclick="toggleMic()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-lg border border-slate-300 shrink-0 transition" title="คลิกเพื่อเปิดไมค์พูด (สามารถพูดแทรก AI ได้ทันที)">
           🎙️
         </button>
-        <input id="input-speech" type="text" placeholder="พิมพ์ข้อความตอบกลับ หรือคลิกไมค์..." onkeydown="if(event.key==='Enter') sendInputSpeech()" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+        <input id="input-speech" type="text" placeholder="พิมพ์ข้อความตอบกลับ หรือคลิกไมค์ (AI จะหยุดฟังทันทีเมื่อคุณเริ่มพูด)..." onkeydown="if(event.key==='Enter') sendInputSpeech()" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
         <button onclick="sendInputSpeech()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shrink-0">
           ตอบ
         </button>
@@ -861,12 +880,27 @@
     let speechRecognizer = null;
     let currentBusiness = {};
     let currentUser = {};
+    let scriptsList = [];
+    let activeCallScriptId = null;
     let pendingTopup = null;
+
+    // Toast notification
+    function showToast(msg, icon = '✅') {
+      const toast = document.getElementById('toast-banner');
+      document.getElementById('toast-msg').innerText = msg;
+      document.getElementById('toast-icon').innerText = icon;
+      toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-100px]', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+    }
 
     // Tab Switching
     function switchTab(tabId) {
       activeTab = tabId;
-      const tabs = ['dashboard', 'business', 'voice', 'queue', 'wallet', 'users'];
+      const tabs = ['dashboard', 'scripts', 'business', 'voice', 'queue', 'wallet', 'users'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`tab-btn-${t}`);
@@ -882,9 +916,10 @@
 
       const titleMap = {
         dashboard: ['Campaign Report', 'รายงานสถิติการโทรออกและการติดตามผลรายวัน'],
+        scripts: ['Multi-Script Library', 'คลังชุดสคริปต์การโทร กำหนดเป้าหมายและบทสนทนารายสาย'],
         business: ['Core Business Setup', 'กำหนดธุรกิจ บริการหลัก และความรู้เฉพาะทางของ AI'],
         voice: ['AI Voice & Personality', 'ปรับแต่งเสียงพูดภาษาไทย โทนเสียง และความเร็ว'],
-        queue: ['Outbound Queue & Scheduler', 'จัดการคิวรายชื่อและกำหนดเวลาโทรออก'],
+        queue: ['Outbound Queue & Scheduler', 'จัดการคิวรายชื่อและกำหนดชุดสคริปต์รายสาย'],
         wallet: ['PromptPay Wallet', 'กระเป๋าเครดิตและเติมเงินผ่านระบบพร้อมเพย์'],
         users: ['User Management (RBAC)', 'จัดการผู้ใช้และระดับสิทธิ์การเข้าถึง']
       };
@@ -893,6 +928,7 @@
         document.getElementById('header-subtitle').innerText = titleMap[tabId][1];
       }
 
+      if (tabId === 'scripts') loadScriptsData();
       if (tabId === 'business') loadBusinessProfiles();
       if (tabId === 'queue') loadCustomerQueue();
       if (tabId === 'wallet') loadWalletData();
@@ -907,7 +943,6 @@
         currentBusiness = data.active_business || {};
         currentUser = data.current_user || {};
 
-        // Update brand in sidebar
         document.getElementById('nav-active-business-name').innerText = currentBusiness.name || 'AI Voice';
         document.getElementById('sidebar-credits').innerText = `${currentUser.credits?.toLocaleString() || 0} แต้ม`;
         document.getElementById('top-credits-count').innerText = currentUser.credits?.toLocaleString() || 0;
@@ -915,24 +950,19 @@
         document.getElementById('sidebar-user-role').innerText = currentUser.role_badge || 'User';
         document.getElementById('select-role-switch').value = currentUser.role || 'owner';
 
-        // Stats
         document.getElementById('stat-total').innerText = data.stats.total;
         document.getElementById('stat-answered').innerText = data.stats.answered;
         document.getElementById('stat-answered-percent').innerText = data.stats.answered_percent;
         document.getElementById('stat-pending').innerText = data.stats.pending;
         document.getElementById('stat-unreachable').innerText = data.stats.unreachable;
 
-        document.getElementById('num-attended').innerText = data.outcomes.attended;
-        document.getElementById('num-rescheduled').innerText = data.outcomes.rescheduled;
-        document.getElementById('num-cancelled').innerText = data.outcomes.cancelled;
-
-        // Calls table
+        // Render Calls Table
         const tbody = document.getElementById('table-calls');
         tbody.innerHTML = '';
         data.calls.forEach(call => {
           let outcomeBadge = '<span class="text-slate-400">-</span>';
-          if (call.appointment_outcome === 'มาตามนัด') {
-            outcomeBadge = '<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded border border-emerald-200">มาตามนัด</span>';
+          if (call.appointment_outcome === 'มาตามนัด' || call.appointment_outcome === 'สนใจโปรโมชั่น') {
+            outcomeBadge = `<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded border border-emerald-200">${call.appointment_outcome}</span>`;
           } else if (call.appointment_outcome === 'ขอเลื่อนนัด') {
             outcomeBadge = '<span class="bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded border border-blue-200">ขอเลื่อนนัด</span>';
           } else if (call.appointment_outcome === 'ยกเลิกนัด' || (call.appointment_outcome && call.appointment_outcome.includes('ผิดเบอร์'))) {
@@ -950,7 +980,11 @@
                 ${call.name}<br>
                 <span class="text-[11px] text-slate-400">${call.phone}</span>
               </td>
-              <td class="py-3 px-4 text-slate-500">${call.job_ref}</td>
+              <td class="py-3 px-4 text-slate-700 font-medium">
+                <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] border border-slate-200">
+                  ${call.script_name || 'สคริปต์มาตรฐาน'}
+                </span>
+              </td>
               <td class="py-3 px-4">
                 <span class="${statusColor}">${call.status}</span><br>
                 <span class="text-[11px] text-slate-400">คุย ${call.duration}</span>
@@ -984,13 +1018,120 @@
         });
         const data = await res.json();
         currentUser = data.current_user;
+        showToast(`สลับบทบาทเป็น ${currentUser.role_badge}`);
         loadDashboard();
       } catch (e) {
         console.error(e);
       }
     }
 
-    // Core Business Settings
+    // -------------------------------------------------------------
+    // Scripts Library Controller
+    // -------------------------------------------------------------
+    async function loadScriptsData() {
+      try {
+        const res = await fetch('/api/scripts');
+        const data = await res.json();
+        scriptsList = data.scripts;
+        renderScriptsGrid();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderScriptsGrid() {
+      const grid = document.getElementById('grid-scripts');
+      grid.innerHTML = '';
+      scriptsList.forEach(s => {
+        const genderBadge = s.agent_gender === 'male' 
+          ? '<span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] font-semibold">👨‍💼 ชาย (Niwat)</span>'
+          : '<span class="bg-pink-50 text-pink-700 px-2 py-0.5 rounded text-[10px] font-semibold">👩‍💼 หญิง (Premwadee)</span>';
+
+        const card = `
+          <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3 flex flex-col justify-between hover:border-blue-400 transition">
+            <div class="space-y-2">
+              <div class="flex justify-between items-start">
+                <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-semibold">
+                  ${s.industry}
+                </span>
+                ${genderBadge}
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm">${s.name}</h4>
+              <p class="text-xs text-slate-500">🏢 ${s.business_name} • ตัวแทน: <span class="font-semibold text-slate-700">${s.agent_name}</span></p>
+              
+              <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-[11px] text-slate-600 space-y-1">
+                <p><span class="font-bold text-slate-700">เป้าหมาย:</span> ${s.objective}</p>
+                <p class="truncate"><span class="font-bold text-slate-700">เปิดสาย:</span> "${s.opening_text}"</p>
+              </div>
+            </div>
+
+            <div class="pt-2 flex justify-between items-center border-t border-slate-100 text-xs">
+              <button onclick="testScriptDirectly('${s.id}')" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center space-x-1">
+                <span>📞</span> <span>ทดลองโทรด้วยสคริปต์นี้</span>
+              </button>
+              <button onclick="deleteScript('${s.id}')" class="text-slate-400 hover:text-rose-600" title="ลบสคริปต์">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+        grid.innerHTML += card;
+      });
+    }
+
+    function openCreateScriptModal() {
+      document.getElementById('modal-create-script').classList.remove('hidden');
+    }
+    function closeCreateScriptModal() {
+      document.getElementById('modal-create-script').classList.add('hidden');
+    }
+
+    async function submitCreateScript() {
+      const payload = {
+        name: document.getElementById('script-name').value,
+        business_name: document.getElementById('script-biz-name').value,
+        industry: document.getElementById('script-industry').value,
+        agent_name: document.getElementById('script-agent-name').value,
+        agent_gender: document.getElementById('script-gender').value,
+        voice_id: document.getElementById('script-gender').value === 'male' ? 'th-TH-NiwatNeural' : 'th-TH-PremwadeeNeural',
+        opening_text: document.getElementById('script-opening').value,
+        objective: document.getElementById('script-objective').value,
+        custom_instructions: document.getElementById('script-custom').value
+      };
+      if (!payload.name) return alert('กรุณากรอกชื่อชุดสคริปต์');
+      try {
+        await fetch('/api/scripts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        closeCreateScriptModal();
+        showToast('สร้างชุดสคริปต์ใหม่เรียบร้อยแล้ว!');
+        loadScriptsData();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function deleteScript(id) {
+      if (!confirm('ยืนยันการลบชุดสคริปต์นี้?')) return;
+      try {
+        await fetch(`/api/scripts/${id}`, {method: 'DELETE'});
+        showToast('ลบชุดสคริปต์เรียบร้อย');
+        loadScriptsData();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function testScriptDirectly(scriptId) {
+      activeCallScriptId = scriptId;
+      openCallModal("คุณลูกค้า", "081-222-3344", null, scriptId);
+    }
+
+    // -------------------------------------------------------------
+    // Core Business Settings (Real-time Persistence Fix)
+    // -------------------------------------------------------------
     async function loadBusinessProfiles() {
       try {
         const res = await fetch('/api/business_profiles');
@@ -1010,15 +1151,12 @@
       document.getElementById('biz-opening-text').value = biz.opening_text || '';
       document.getElementById('biz-custom-instructions').value = biz.custom_instructions || '';
       
-      // Update template card highlight
       ['clinic', 'automotive', 'realestate', 'dental', 'custom'].forEach(t => {
         const card = document.getElementById(`card-tmpl-${t}`);
         if (card) {
-          if (biz.id === t) {
-            card.className = 'bg-white p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer shadow-sm transition';
-          } else {
-            card.className = 'bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 transition';
-          }
+          card.className = biz.id === t 
+            ? 'bg-white p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer shadow-sm transition'
+            : 'bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 transition';
         }
       });
     }
@@ -1033,6 +1171,7 @@
         const data = await res.json();
         currentBusiness = data.active_profile;
         populateBusinessForm(currentBusiness);
+        showToast(`สลับธุรกิจเป็น ${currentBusiness.name} เรียบร้อย!`);
         loadDashboard();
       } catch (e) {
         console.error(e);
@@ -1056,18 +1195,19 @@
         });
         const data = await res.json();
         currentBusiness = data.active_profile;
-        alert('บันทึกการตั้งค่าธุรกิจเรียบร้อยแล้ว!');
+        showToast('บันทึกการตั้งค่าธุรกิจสำเร็จ!');
         loadDashboard();
       } catch (e) {
         console.error(e);
       }
     }
 
-    // Voice Config & Preview
-    function selectVoiceGender(gender) {
+    // -------------------------------------------------------------
+    // Voice Config & Real-time Update
+    // -------------------------------------------------------------
+    async function selectVoiceGender(gender) {
       const isFemale = gender === 'female';
-      currentBusiness.agent_gender = gender;
-      currentBusiness.voice_id = isFemale ? 'th-TH-PremwadeeNeural' : 'th-TH-NiwatNeural';
+      const voiceId = isFemale ? 'th-TH-PremwadeeNeural' : 'th-TH-NiwatNeural';
       
       document.getElementById('voice-card-female').className = isFemale 
         ? 'p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer transition'
@@ -1076,25 +1216,57 @@
       document.getElementById('voice-card-male').className = !isFemale 
         ? 'p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer transition'
         : 'p-4 rounded-xl border border-slate-200 hover:border-blue-400 cursor-pointer transition';
+
+      // Persist immediately to server
+      try {
+        const res = await fetch('/api/business_profiles/update', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({agent_gender: gender, voice_id: voiceId})
+        });
+        const data = await res.json();
+        currentBusiness = data.active_profile;
+        showToast(`เปลี่ยนเสียงเป็น: ${isFemale ? 'เสียงผู้หญิง (Premwadee)' : 'เสียงผู้ชาย (Niwat)'}`);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    function setTone(tone) {
-      currentBusiness.tone = tone;
+    async function setTone(tone) {
       ['Friendly', 'Formal', 'Energetic'].forEach(t => {
         const btn = document.getElementById(`tone-${t}`);
         if (btn) {
-          if (t === tone) {
-            btn.className = 'py-2 px-3 text-xs rounded-lg border font-semibold border-blue-600 bg-blue-50 text-blue-600';
-          } else {
-            btn.className = 'py-2 px-3 text-xs rounded-lg border font-semibold border-slate-300 text-slate-600 hover:bg-slate-50';
-          }
+          btn.className = t === tone 
+            ? 'py-2 px-3 text-xs rounded-lg border font-semibold border-blue-600 bg-blue-50 text-blue-600'
+            : 'py-2 px-3 text-xs rounded-lg border font-semibold border-slate-300 text-slate-600 hover:bg-slate-50';
         }
       });
+
+      try {
+        const res = await fetch('/api/business_profiles/update', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({tone: tone})
+        });
+        const data = await res.json();
+        currentBusiness = data.active_profile;
+        showToast(`ปรับโทนเสียง: ${tone}`);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    function onSpeedSlider(val) {
-      currentBusiness.speed = parseFloat(val);
+    async function onSpeedSlider(val) {
       document.getElementById('speed-label').innerText = `${val}x (${val == 1.0 ? 'ปกติ' : val < 1.0 ? 'ช้า' : 'เร็ว'})`;
+      try {
+        await fetch('/api/business_profiles/update', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({speed: parseFloat(val)})
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     async function triggerVoicePreview() {
@@ -1126,21 +1298,41 @@
       }
     }
 
-    // Customer Queue
+    // -------------------------------------------------------------
+    // Customer Queue & Script Assignment Controller
+    // -------------------------------------------------------------
     async function loadCustomerQueue() {
       try {
         const res = await fetch('/api/customers');
         const data = await res.json();
+        scriptsList = data.scripts || [];
         const tbody = document.getElementById('table-queue');
         tbody.innerHTML = '';
         document.getElementById('badge-queue-count').innerText = data.queue.length;
 
+        // Populate script options for new customer modal
+        const scriptSelect = document.getElementById('add-cust-script');
+        scriptSelect.innerHTML = '';
+        scriptsList.forEach(s => {
+          scriptSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+        });
+
         data.queue.forEach(item => {
+          let scriptOptions = '';
+          scriptsList.forEach(s => {
+            const sel = s.id === item.script_id ? 'selected' : '';
+            scriptOptions += `<option value="${s.id}" ${sel}>${s.name}</option>`;
+          });
+
           const row = `
             <tr class="hover:bg-slate-50/60 transition">
               <td class="py-3 px-4 font-semibold text-slate-800">${item.name}</td>
               <td class="py-3 px-4 text-slate-600 font-mono text-[11px]">${item.phone}</td>
-              <td class="py-3 px-4 text-slate-600">${item.detail}</td>
+              <td class="py-3 px-4">
+                <select onchange="updateCustomerScriptAssignment('${item.id}', this.value)" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs font-medium text-slate-700 focus:outline-none">
+                  ${scriptOptions}
+                </select>
+              </td>
               <td class="py-3 px-4 text-blue-600 font-medium">${item.scheduled_time}</td>
               <td class="py-3 px-4">
                 <span class="bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded border border-amber-200">
@@ -1149,7 +1341,7 @@
               </td>
               <td class="py-3 px-4 text-center">
                 <div class="flex items-center justify-center space-x-2">
-                  <button onclick="openCallModal('${item.name}', '${item.phone}', '${item.detail}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-[11px] font-semibold">
+                  <button onclick="openCallModal('${item.name}', '${item.phone}', '${item.detail}', '${item.script_id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-[11px] font-semibold">
                     📞 โทรทันที
                   </button>
                   <button onclick="deleteCustomerQueue('${item.id}')" class="text-slate-400 hover:text-rose-600 text-sm">
@@ -1166,6 +1358,19 @@
       }
     }
 
+    async function updateCustomerScriptAssignment(customerId, scriptId) {
+      try {
+        await fetch(`/api/customers/${customerId}/script`, {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({script_id: scriptId})
+        });
+        showToast('เปลี่ยนชุดสคริปต์ของสายนี้เรียบร้อย');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     function openAddCustomerModal() {
       document.getElementById('modal-add-customer').classList.remove('hidden');
     }
@@ -1177,7 +1382,7 @@
       const payload = {
         name: document.getElementById('add-cust-name').value,
         phone: document.getElementById('add-cust-phone').value,
-        detail: document.getElementById('add-cust-detail').value,
+        script_id: document.getElementById('add-cust-script').value,
         scheduled_time: document.getElementById('add-cust-time').value
       };
       if (!payload.name || !payload.phone) return alert('กรุณากรอกชื่อและเบอร์โทร');
@@ -1188,6 +1393,7 @@
           body: JSON.stringify(payload)
         });
         closeAddCustomerModal();
+        showToast('เพิ่มรายชื่อเข้าคิวเรียบร้อย');
         loadCustomerQueue();
       } catch (e) {
         console.error(e);
@@ -1198,13 +1404,16 @@
       if (!confirm('ยืนยันการลบคิวนี้?')) return;
       try {
         await fetch(`/api/customers/${id}`, {method: 'DELETE'});
+        showToast('ลบคิวเรียบร้อย');
         loadCustomerQueue();
       } catch (e) {
         console.error(e);
       }
     }
 
-    // PromptPay Wallet
+    // -------------------------------------------------------------
+    // PromptPay Wallet Controller
+    // -------------------------------------------------------------
     async function loadWalletData() {
       try {
         const res = await fetch('/api/credits');
@@ -1274,7 +1483,7 @@
           })
         });
         const data = await res.json();
-        alert(data.message);
+        showToast(data.message);
         closePromptPayModal();
         loadDashboard();
         loadWalletData();
@@ -1285,7 +1494,9 @@
       }
     }
 
-    // RBAC User Management
+    // -------------------------------------------------------------
+    // RBAC User Management Controller
+    // -------------------------------------------------------------
     async function loadUsersData() {
       try {
         const res = await fetch('/api/users');
@@ -1351,21 +1562,42 @@
           body: JSON.stringify(payload)
         });
         closeAddUserModal();
+        showToast('เพิ่มผู้ใช้งานใหม่เรียบร้อย');
         loadUsersData();
       } catch (e) {
         console.error(e);
       }
     }
 
-    // Call Simulation Modal
-    function openCallModal(name = "คุณจ๋า", phone = "093-340-9929", detail = null) {
-      const agentName = currentBusiness.agent_name || 'เจ้าหน้าที่ AI';
-      const bizName = currentBusiness.name || 'ศูนย์บริการ';
+    // -------------------------------------------------------------
+    // VOICE BARGE-IN ENGINE & CALL SIMULATION
+    // -------------------------------------------------------------
+    
+    // Core Barge-in function: Immediately halts AI audio speech when customer interrupts
+    function stopAIAudio(reason = "ลูกค้าพูดแทรก") {
+      const player = document.getElementById('audio-player');
+      if (player && !player.paused) {
+        player.pause();
+        player.currentTime = 0;
+        document.getElementById('modal-call-status').innerText = `👂 ${reason}... AI หยุดพูดเพื่อฟัง`;
+        document.getElementById('call-pulse').classList.remove('hidden');
+        console.log(`[Barge-in Triggered]: ${reason}`);
+      }
+    }
+
+    function openCallModal(name = "คุณจ๋า", phone = "093-340-9929", detail = null, scriptId = null) {
+      activeCallScriptId = scriptId;
       
-      document.getElementById('modal-customer-name').innerText = `${agentName} กำลังโทรหา ${name}`;
-      document.getElementById('modal-customer-phone').innerText = `${phone} • สายตรง${bizName}`;
-      document.getElementById('call-avatar').innerText = currentBusiness.agent_gender === 'male' ? '👨‍💼' : '👩‍💼';
-      
+      // Populate script selection in modal
+      const modalSelect = document.getElementById('modal-select-script');
+      modalSelect.innerHTML = '<option value="">⚙️ สคริปต์ค่าเริ่มต้นตามธุรกิจปัจจุบัน</option>';
+      scriptsList.forEach(s => {
+        const sel = s.id === scriptId ? 'selected' : '';
+        modalSelect.innerHTML += `<option value="${s.id}" ${sel}>📜 ${s.name}</option>`;
+      });
+
+      document.getElementById('modal-customer-name').innerText = `AI กำลังโทรหา ${name}`;
+      document.getElementById('modal-customer-phone').innerText = `${phone} • สายตรงศูนย์บริการ`;
       document.getElementById('transcript-box').innerHTML = `
         <div class="text-center text-slate-400 text-xs py-4">
           กำลังหมุนเบอร์และเชื่อมต่อสัญญาณโทรศัพท์...
@@ -1376,8 +1608,12 @@
       document.getElementById('modal-call-status').innerText = 'สายกำลังเรียก (Ringing)...';
 
       setTimeout(() => {
-        executeStartCall(name, phone, detail);
-      }, 1000);
+        executeStartCall(name, phone, detail, scriptId);
+      }, 900);
+    }
+
+    function onModalScriptChanged(val) {
+      activeCallScriptId = val;
     }
 
     function closeCallModal() {
@@ -1385,15 +1621,21 @@
       document.getElementById('call-pulse').classList.add('hidden');
       const audio = document.getElementById('audio-player');
       audio.pause();
+      audio.currentTime = 0;
       loadDashboard();
     }
 
-    async function executeStartCall(name, phone, detail) {
+    async function executeStartCall(name, phone, detail, scriptId) {
       try {
         const res = await fetch('/api/start_call', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, phone: phone, detail: detail })
+          body: JSON.stringify({
+            name: name,
+            phone: phone,
+            detail: detail,
+            script_id: activeCallScriptId || scriptId
+          })
         });
         if (res.status === 402) {
           alert('เครดิตของคุณหมดแล้ว กรุณาเติมเครดิตผ่านพร้อมเพย์ก่อนเริ่มการโทรครับ');
@@ -1404,10 +1646,13 @@
         const data = await res.json();
         currentSessionId = data.session_id;
 
+        document.getElementById('modal-customer-name').innerText = `${data.agent_name} กำลังสนทนากับ ${name}`;
+        document.getElementById('modal-customer-phone').innerText = `${phone} • ${data.business_name} (${data.script_name})`;
+        document.getElementById('call-avatar').innerText = data.agent_gender === 'male' ? '👨‍💼' : '👩‍💼';
         document.getElementById('modal-call-status').innerText = 'สายติดแล้ว (Connected)';
         document.getElementById('transcript-box').innerHTML = '';
 
-        appendMessage('AI', data.speech);
+        appendMessage(data.agent_name || 'AI', data.speech);
         playVoiceAudio(data.audio_url);
       } catch (err) {
         console.error('Start call error:', err);
@@ -1416,7 +1661,7 @@
 
     function appendMessage(speaker, text) {
       const box = document.getElementById('transcript-box');
-      const isAI = speaker === 'AI';
+      const isAI = speaker !== 'ลูกค้า';
       const bubble = `
         <div class="flex ${isAI ? 'justify-start' : 'justify-end'}">
           <div class="max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed ${
@@ -1442,6 +1687,9 @@
       const input = document.getElementById('input-speech');
       const text = input.value.trim();
       if (!text || !currentSessionId) return;
+
+      // Stop any current audio immediately on response send
+      stopAIAudio('ลูกค้าส่งคำตอบ');
 
       input.value = '';
       appendMessage('ลูกค้า', text);
@@ -1473,31 +1721,54 @@
     }
 
     function sendPresetText(text) {
+      stopAIAudio('ลูกค้ากดเลือกคำตอบ');
       document.getElementById('input-speech').value = text;
       sendInputSpeech();
     }
 
     function hangupCall() {
+      stopAIAudio('วางสาย');
       appendMessage('ระบบ', 'สายถูกตัดแล้ว');
       document.getElementById('modal-call-status').innerText = 'วางสายเรียบร้อย';
       document.getElementById('call-pulse').classList.add('hidden');
       setTimeout(() => {
         closeCallModal();
-      }, 700);
+      }, 600);
     }
 
-    // Web Speech API
+    // Web Speech API with Built-in Barge-In Hooks
     function initSpeech() {
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         speechRecognizer = new SpeechRec();
         speechRecognizer.lang = 'th-TH';
-        speechRecognizer.continuous = false;
+        speechRecognizer.continuous = true;
+        speechRecognizer.interimResults = true;
+
+        // Barge-in: as soon as speech sound is detected, stop AI audio immediately
+        speechRecognizer.onspeechstart = function() {
+          stopAIAudio('ลูกค้าพูดแทรก (Barge-in)');
+        };
+        speechRecognizer.onsoundstart = function() {
+          stopAIAudio('ตรวจพบเสียงพูดของลูกค้า');
+        };
 
         speechRecognizer.onresult = function(event) {
-          const transcript = event.results[0][0].transcript;
-          document.getElementById('input-speech').value = transcript;
-          sendInputSpeech();
+          stopAIAudio('ลูกค้ากำลังพูด');
+          let interimTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              const finalTranscript = event.results[i][0].transcript;
+              document.getElementById('input-speech').value = finalTranscript;
+              sendInputSpeech();
+              return;
+            } else {
+              interimTranscript += event.results[i][0].transcript;
+            }
+          }
+          if (interimTranscript) {
+            document.getElementById('modal-call-status').innerText = `👂 ลูกค้า: "${interimTranscript}"`;
+          }
         };
 
         speechRecognizer.onend = function() {
@@ -1506,6 +1777,16 @@
           btn.classList.remove('bg-rose-500', 'text-white', 'animate-pulse');
           btn.classList.add('bg-slate-100', 'text-slate-700');
         };
+      }
+
+      // Input listener for keyboard barge-in
+      const inputEl = document.getElementById('input-speech');
+      if (inputEl) {
+        inputEl.addEventListener('input', function() {
+          if (inputEl.value.trim().length > 0) {
+            stopAIAudio('ลูกค้ากำลังพิมพ์แทรก');
+          }
+        });
       }
     }
 
@@ -1516,6 +1797,8 @@
       const btn = document.getElementById('btn-mic');
       if (!isMicRecording) {
         try {
+          // When turning mic on, stop AI audio so there is no echo loop
+          stopAIAudio('เปิดไมค์สนทนา');
           speechRecognizer.start();
           isMicRecording = true;
           btn.classList.remove('bg-slate-100', 'text-slate-700');
@@ -1532,6 +1815,7 @@
     // Startup
     loadDashboard();
     initSpeech();
+    loadScriptsData();
   </script>
 </body>
 </html>
