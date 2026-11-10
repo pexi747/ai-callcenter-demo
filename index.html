@@ -547,6 +547,44 @@
           </div>
         </div>
 
+        <!-- Admin PromptPay Configuration Box -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow space-y-4">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+            <div class="flex items-center space-x-2">
+              <span class="text-lg">⚙️</span>
+              <h3 class="font-bold text-slate-800 text-sm">ตั้งค่าบัญชีรับเงินพร้อมเพย์ (Admin Configuration)</h3>
+            </div>
+            <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold border border-blue-200">
+              Admin & Owner Access
+            </span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">หมายเลขพร้อมเพย์ (เบอร์มือถือ หรือ เลขประจำตัว 13 หลัก)</label>
+              <input type="text" id="admin-pp-number" placeholder="เช่น 081-234-5678 หรือ 0105566012345" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono font-bold text-blue-700">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อบัญชีรับเงิน (Account Name)</label>
+              <input type="text" id="admin-pp-name" placeholder="เช่น บจก. แอนติกราวิตี้ อินโนเวชั่น" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-medium">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">ธนาคารเจ้าของบัญชี (Bank Name)</label>
+              <input type="text" id="admin-pp-bank" placeholder="เช่น ธนาคารกสิกรไทย (KBANK)" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-medium">
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-2">
+            <p class="text-[11px] text-slate-400">
+              💡 ระบบรองรับทั้งเบอร์โทรศัพท์ (Sub-tag 01) และเลขประจำตัวผู้เสียภาษี/บัตรประชาชน 13 หลัก (Sub-tag 02) ตามมาตรฐาน EMVCo Tag 29
+            </p>
+            <button onclick="saveAdminPromptPay()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1.5">
+              <span>💾</span>
+              <span>บันทึกเลขพร้อมเพย์</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Transactions -->
         <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-200">
@@ -761,7 +799,36 @@
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">URL โลโก้แบรนด์ (Logo Image URL)</label>
-                <input type="text" id="branding-logo-url" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono">
+                <input type="text" id="branding-logo-url" oninput="updateLivePreview(); extractColorsFromImage(this.value);" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono">
+              </div>
+            </div>
+
+            <!-- Logo Upload Dropzone Area -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5">อัปโหลดไฟล์รูปภาพโลโก้ (Local Logo File Upload)</label>
+              <input type="file" id="logo-file-input" accept="image/*" class="hidden" onchange="handleLogoFileSelect(event)">
+              <div id="logo-dropzone" 
+                   ondragover="handleDragOver(event)" 
+                   ondragleave="handleDragLeave(event)" 
+                   ondrop="handleLogoDrop(event)"
+                   onclick="document.getElementById('logo-file-input').click()"
+                   class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-4 text-center cursor-pointer bg-slate-50/50 hover:bg-blue-50/30 transition group">
+                <div class="flex flex-col items-center justify-center space-y-1.5">
+                  <span class="text-2xl group-hover:scale-110 transition-transform">📁</span>
+                  <p class="text-xs font-bold text-slate-700 group-hover:text-blue-600">ลากและวางไฟล์รูปภาพที่นี่ หรือคลิกเพื่อเลือกไฟล์จากเครื่อง</p>
+                  <p class="text-[11px] text-slate-400">รองรับไฟล์ PNG, JPG, SVG, WebP (จะถูกแปลงเป็น Base64 Data URL อัตโนมัติ)</p>
+                  <button type="button" class="mt-1 bg-white border border-slate-300 text-slate-700 group-hover:border-blue-500 group-hover:text-blue-600 px-3 py-1 rounded-lg text-xs font-semibold shadow-xs">
+                    📁 อัปโหลดรูปภาพโลโก้จากเครื่อง
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- CI Color Palette Auto-Extracted -->
+            <div id="logo-extracted-colors-box" class="space-y-2">
+              <label class="block text-xs font-bold text-slate-700">🎨 สี CI ที่วิเคราะห์ได้จากโลโก้ (Auto-extracted from Logo):</label>
+              <div id="logo-extracted-colors" class="flex flex-wrap items-center gap-2">
+                <span class="text-[11px] text-slate-400 italic">เลือกหรืออัปโหลดโลโก้เพื่อสกัดพาเล็ตต์สี CI อัตโนมัติ</span>
               </div>
             </div>
 
@@ -775,6 +842,7 @@
               <label class="block text-xs font-semibold text-slate-700 mb-1.5">ธีมสีหลักของแพลตฟอร์ม (Primary Theme Color)</label>
               <div class="flex items-center space-x-3">
                 <input type="color" id="branding-color" onchange="updateLivePreview()" class="w-10 h-10 rounded-lg cursor-pointer border border-slate-300 p-0.5">
+                <input type="text" id="branding-color-hex" oninput="onHexColorInput(this.value)" placeholder="#2563eb" class="w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-mono font-bold uppercase focus:outline-none">
                 <div class="flex items-center space-x-2">
                   <button type="button" onclick="setPresetColor('#2563eb')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-xs">#2563eb (Classic Blue)</button>
                   <button type="button" onclick="setPresetColor('#059669')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-xs">#059669 (Emerald)</button>
@@ -992,8 +1060,10 @@
           <img id="pp-qr-image" src="" alt="PromptPay QR Code" class="w-48 h-48 mx-auto rounded-lg">
         </div>
 
-        <div class="text-[11px] text-slate-400 space-y-0.5">
-          <p>เลขพร้อมเพย์: <span class="font-semibold text-slate-700">081-234-5678</span></p>
+        <div class="text-[11px] text-slate-500 space-y-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-left">
+          <p>ชื่อบัญชี: <span id="pp-modal-name" class="font-bold text-slate-800">บริษัท แอนติกราวิตี้ อินโนเวชั่น จำกัด (บัญชีรับชำระ)</span></p>
+          <p>ธนาคาร: <span id="pp-modal-bank" class="font-medium text-slate-700">ธนาคารกสิกรไทย (KBANK)</span></p>
+          <p>เลขพร้อมเพย์: <span id="pp-modal-number" class="font-mono font-bold text-blue-600">081-234-5678</span></p>
           <p>เลขอ้างอิง: <span id="pp-modal-ref" class="font-semibold text-slate-700">PP-20261110-001</span></p>
         </div>
 
@@ -1217,6 +1287,10 @@
           currentTelephony = data.telephony;
           const modalBadge = document.getElementById('modal-trunk-badge');
           if (modalBadge) modalBadge.innerText = `${data.telephony.provider_name} [${data.telephony.caller_id}]`;
+        }
+        if (data.promptpay) {
+          currentPromptPayConfig = data.promptpay;
+          populateAdminPromptPay(data.promptpay);
         }
 
         document.getElementById('nav-active-business-name').innerText = currentBusiness.name || 'AI Voice';
@@ -1696,6 +1770,11 @@
         const data = await res.json();
         document.getElementById('wallet-balance').innerText = data.credits.toLocaleString();
         
+        if (data.promptpay) {
+          currentPromptPayConfig = data.promptpay;
+          populateAdminPromptPay(data.promptpay);
+        }
+
         const tbody = document.getElementById('table-transactions');
         tbody.innerHTML = '';
         data.transactions.forEach(txn => {
@@ -1732,6 +1811,17 @@
         document.getElementById('pp-modal-credits').innerText = `ได้รับ ${credits.toLocaleString()} เครดิต`;
         document.getElementById('pp-qr-image').src = data.qr_image_url;
         document.getElementById('pp-modal-ref').innerText = data.reference_id;
+        
+        if (document.getElementById('pp-modal-name')) {
+          document.getElementById('pp-modal-name').innerText = data.account_name || currentPromptPayConfig.account_name;
+        }
+        if (document.getElementById('pp-modal-bank')) {
+          document.getElementById('pp-modal-bank').innerText = data.bank_name || currentPromptPayConfig.bank_name;
+        }
+        if (document.getElementById('pp-modal-number')) {
+          document.getElementById('pp-modal-number').innerText = data.promptpay_number || currentPromptPayConfig.promptpay_number;
+        }
+
         pendingTopup.reference_id = data.reference_id;
 
         document.getElementById('modal-promptpay').classList.remove('hidden');
@@ -2306,6 +2396,263 @@
         showToast('บันทึกการตั้งค่าแบรนด์และ White-Label สำเร็จ!');
       } catch (e) {
         console.error(e);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Admin PromptPay Configuration Controller
+    // -------------------------------------------------------------
+    let currentPromptPayConfig = {
+      promptpay_number: "081-234-5678",
+      account_name: "บริษัท แอนติกราวิตี้ อินโนเวชั่น จำกัด (บัญชีรับชำระ)",
+      bank_name: "ธนาคารกสิกรไทย (KBANK)",
+      type: "mobile"
+    };
+
+    async function loadAdminPromptPay() {
+      try {
+        const res = await fetch('/api/admin/promptpay');
+        const data = await res.json();
+        currentPromptPayConfig = data;
+        populateAdminPromptPay(data);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function populateAdminPromptPay(cfg) {
+      const numEl = document.getElementById('admin-pp-number');
+      const nameEl = document.getElementById('admin-pp-name');
+      const bankEl = document.getElementById('admin-pp-bank');
+      if (numEl) numEl.value = cfg.promptpay_number || '';
+      if (nameEl) nameEl.value = cfg.account_name || '';
+      if (bankEl) bankEl.value = cfg.bank_name || '';
+    }
+
+    async function saveAdminPromptPay() {
+      const payload = {
+        promptpay_number: document.getElementById('admin-pp-number').value.trim(),
+        account_name: document.getElementById('admin-pp-name').value.trim(),
+        bank_name: document.getElementById('admin-pp-bank').value.trim()
+      };
+      try {
+        const res = await fetch('/api/admin/promptpay', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentPromptPayConfig = data.promptpay;
+          populateAdminPromptPay(data.promptpay);
+          showToast(data.message || 'บันทึกเลขพร้อมเพย์สำเร็จ!');
+        }
+      } catch (e) {
+        console.error('Save promptpay error:', e);
+        showToast('เกิดข้อผิดพลาดในการบันทึก');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Logo Upload & Smart Palette Extractor (CI Analysis)
+    // -------------------------------------------------------------
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dz = document.getElementById('logo-dropzone');
+      if (dz) dz.classList.add('border-blue-500', 'bg-blue-50/50');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dz = document.getElementById('logo-dropzone');
+      if (dz) dz.classList.remove('border-blue-500', 'bg-blue-50/50');
+    }
+
+    function handleLogoDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleDragLeave(e);
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        processLogoFile(e.dataTransfer.files[0]);
+      }
+    }
+
+    function handleLogoFileSelect(e) {
+      if (e.target && e.target.files && e.target.files.length > 0) {
+        processLogoFile(e.target.files[0]);
+      }
+    }
+
+    async function processLogoFile(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น (PNG, JPG, SVG, WebP)');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = async function(event) {
+        const base64Data = event.target.result;
+        
+        document.getElementById('branding-logo-url').value = base64Data;
+        updateLivePreview();
+        extractColorsFromImage(base64Data);
+        
+        try {
+          const res = await fetch('/api/branding/upload_logo', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ logo_data: base64Data })
+          });
+          const data = await res.json();
+          if (data.success) {
+            showToast('อัปโหลดไฟล์โลโก้สำเร็จ และสกัดสี CI เรียบร้อย!');
+            applyBranding({ logo_url: base64Data });
+          }
+        } catch (err) {
+          console.error('Logo upload error:', err);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function extractColorsFromImage(imageSrc) {
+      if (!imageSrc) return;
+      const container = document.getElementById('logo-extracted-colors');
+      if (!container) return;
+      
+      container.innerHTML = '<span class="text-[11px] text-blue-600 animate-pulse">⏳ กำลังวิเคราะห์พาเล็ตต์สี CI จากรูปภาพ...</span>';
+
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = function() {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 64;
+          canvas.height = 64;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 64, 64);
+          const imgData = ctx.getImageData(0, 0, 64, 64).data;
+          
+          const colorCounts = {};
+          
+          for (let i = 0; i < imgData.length; i += 4) {
+            const r = imgData[i];
+            const g = imgData[i + 1];
+            const b = imgData[i + 2];
+            const a = imgData[i + 3];
+
+            if (a < 128) continue; // Skip transparent
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            if (brightness > 240 || brightness < 20) continue; // Skip near-white & near-black
+
+            // Quantize to group similar shades
+            const qr = Math.min(255, Math.round(r / 16) * 16);
+            const qg = Math.min(255, Math.round(g / 16) * 16);
+            const qb = Math.min(255, Math.round(b / 16) * 16);
+
+            const maxVal = Math.max(qr, qg, qb);
+            const minVal = Math.min(qr, qg, qb);
+            const saturation = maxVal === 0 ? 0 : (maxVal - minVal) / maxVal;
+            
+            const hex = rgbToHex(qr, qg, qb);
+            if (!colorCounts[hex]) {
+              colorCounts[hex] = { hex, count: 0, saturation, brightness };
+            }
+            colorCounts[hex].count += 1 + Math.round(saturation * 3);
+          }
+
+          const sortedColors = Object.values(colorCounts).sort((a, b) => b.count - a.count);
+          const selected = [];
+          for (const item of sortedColors) {
+            const isSimilar = selected.some(sel => colorDistance(sel.hex, item.hex) < 30);
+            if (!isSimilar) {
+              selected.push(item);
+              if (selected.length >= 5) break;
+            }
+          }
+
+          if (selected.length === 0) {
+            selected.push({ hex: '#2563eb', count: 1 });
+            selected.push({ hex: '#059669', count: 1 });
+            selected.push({ hex: '#7c3aed', count: 1 });
+            selected.push({ hex: '#d97706', count: 1 });
+          }
+
+          renderExtractedColorChips(selected);
+        } catch (err) {
+          console.error('Error analyzing image colors:', err);
+          container.innerHTML = '<span class="text-[11px] text-slate-400">ไม่สามารถวิเคราะห์สีจาก URL ภายนอกได้ แนะนำให้อัปโหลดไฟล์รูปภาพตรงจากเครื่อง</span>';
+        }
+      };
+
+      img.onerror = function() {
+        container.innerHTML = '<span class="text-[11px] text-slate-400">โหลดรูปภาพเพื่อวิเคราะห์สีไม่สำเร็จ</span>';
+      };
+
+      img.src = imageSrc;
+    }
+
+    function colorDistance(hex1, hex2) {
+      const rgb1 = hexToRgb(hex1);
+      const rgb2 = hexToRgb(hex2);
+      if (!rgb1 || !rgb2) return 999;
+      return Math.sqrt(
+        Math.pow(rgb1.r - rgb2.r, 2) +
+        Math.pow(rgb1.g - rgb2.g, 2) +
+        Math.pow(rgb1.b - rgb2.b, 2)
+      );
+    }
+
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      }).join("");
+    }
+
+    function renderExtractedColorChips(colorList) {
+      const container = document.getElementById('logo-extracted-colors');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      colorList.forEach((c, idx) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'group flex items-center space-x-2 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:border-blue-500 shadow-2xs hover:shadow-xs transition text-xs font-semibold cursor-pointer';
+        chip.innerHTML = `
+          <span class="w-4 h-4 rounded-full shadow-2xs border border-black/10 inline-block" style="background-color: ${c.hex}"></span>
+          <span class="font-mono text-slate-700 group-hover:text-blue-600">${c.hex.toUpperCase()}</span>
+          ${idx === 0 ? '<span class="text-[9px] bg-blue-100 text-blue-700 px-1 py-0.2 rounded font-bold">เด่น</span>' : ''}
+        `;
+        chip.onclick = function() {
+          selectCIColor(c.hex);
+        };
+        container.appendChild(chip);
+      });
+    }
+
+    function selectCIColor(hex) {
+      document.getElementById('branding-color').value = hex;
+      const hexInput = document.getElementById('branding-color-hex');
+      if (hexInput) hexInput.value = hex.toUpperCase();
+      updateLivePreview();
+      showToast(`เลือกสี CI: ${hex.toUpperCase()} เป็นสีหลักของระบบ`);
+    }
+
+    function onHexColorInput(val) {
+      if (val.startsWith('#') && (val.length === 7 || val.length === 4)) {
+        document.getElementById('branding-color').value = val;
+        updateLivePreview();
       }
     }
 

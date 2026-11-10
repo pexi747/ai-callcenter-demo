@@ -346,6 +346,13 @@ PROMPTPAY_PACKAGES = [
     {"id": "pkg_1000", "amount": 1000, "credits": 1300, "bonus": "+30% สำหรับองค์กร", "popular": False}
 ]
 
+promptpay_config = {
+    "promptpay_number": "081-234-5678",
+    "account_name": "บริษัท แอนติกราวิตี้ อินโนเวชั่น จำกัด (บัญชีรับชำระ)",
+    "bank_name": "ธนาคารกสิกรไทย (KBANK)",
+    "type": "mobile"
+}
+
 transactions_db = [
     {
         "id": "TXN-20261101-01",
@@ -368,15 +375,19 @@ transactions_db = [
 ]
 
 def generate_promptpay_payload(phone_or_id: str, amount: float) -> str:
-    clean = "".join(c for c in phone_or_id if c.isdigit())
-    if clean.startswith("0"):
-        target = "0066" + clean[1:]
-    else:
-        target = clean
-    
+    clean = "".join(c for c in str(phone_or_id) if c.isdigit())
     aid = "0016A000000677010111"
-    sub_01 = f"01{len(target):02d}{target}"
-    tag_29_content = aid + sub_01
+    
+    if len(clean) == 13:
+        # National ID / Tax ID (EMVCo Sub-tag 02)
+        sub_02 = f"0213{clean}"
+        tag_29_content = aid + sub_02
+    else:
+        # Mobile phone number (EMVCo Sub-tag 01)
+        target = "0066" + clean[1:] if clean.startswith("0") else clean
+        sub_01 = f"01{len(target):02d}{target}"
+        tag_29_content = aid + sub_01
+    
     tag_29 = f"29{len(tag_29_content):02d}{tag_29_content}"
     
     amount_str = f"{amount:.2f}"
@@ -603,7 +614,8 @@ async def get_dashboard_data():
         "current_user": current_user,
         "scripts_count": len(SCRIPTS_DB),
         "telephony": telephony_config,
-        "branding": branding_config
+        "branding": branding_config,
+        "promptpay": promptpay_config
     }
 
 # -------------------------------------------------------------
@@ -700,7 +712,8 @@ async def get_credits():
         "credits": current_user["credits"],
         "user_id": current_user["id"],
         "packages": PROMPTPAY_PACKAGES,
-        "transactions": transactions_db
+        "transactions": transactions_db,
+        "promptpay": promptpay_config
     }
 
 @app.post("/api/topup/promptpay_qr")
@@ -711,7 +724,7 @@ async def create_topup_qr(data: dict):
     pkg = next((p for p in PROMPTPAY_PACKAGES if p["id"] == package_id or p["amount"] == amount), None)
     credits_to_add = pkg["credits"] if pkg else int(amount)
     
-    phone_promptpay = "081-234-5678"
+    phone_promptpay = promptpay_config.get("promptpay_number", "081-234-5678")
     ref_id = f"PP-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:4].upper()}"
     payload = generate_promptpay_payload(phone_promptpay, amount)
     
@@ -723,7 +736,34 @@ async def create_topup_qr(data: dict):
         "credits_to_add": credits_to_add,
         "qr_payload": payload,
         "qr_image_url": qr_image_url,
-        "promptpay_number": phone_promptpay
+        "promptpay_number": phone_promptpay,
+        "account_name": promptpay_config.get("account_name", ""),
+        "bank_name": promptpay_config.get("bank_name", "")
+    }
+
+# -------------------------------------------------------------
+# 12b. Endpoints: Admin PromptPay Configuration
+# -------------------------------------------------------------
+@app.get("/api/admin/promptpay")
+async def get_admin_promptpay():
+    return promptpay_config
+
+@app.post("/api/admin/promptpay")
+async def update_admin_promptpay(data: dict):
+    global promptpay_config
+    if "promptpay_number" in data and data["promptpay_number"] is not None:
+        raw_number = str(data["promptpay_number"]).strip()
+        promptpay_config["promptpay_number"] = raw_number
+        clean = "".join(c for c in raw_number if c.isdigit())
+        promptpay_config["type"] = "national_id" if len(clean) == 13 else "mobile"
+    if "account_name" in data and data["account_name"] is not None:
+        promptpay_config["account_name"] = str(data["account_name"]).strip()
+    if "bank_name" in data and data["bank_name"] is not None:
+        promptpay_config["bank_name"] = str(data["bank_name"]).strip()
+    return {
+        "success": True,
+        "promptpay": promptpay_config,
+        "message": "อัปเดตการตั้งค่าบัญชีรับเงินพร้อมเพย์สำเร็จ"
     }
 
 @app.post("/api/topup/confirm")
@@ -1102,6 +1142,19 @@ async def update_branding_endpoint(data: dict):
         "success": True,
         "branding": branding_config,
         "message": "อัปเดตข้อมูลแบรนด์และ White-Label สำเร็จ"
+    }
+
+@app.post("/api/branding/upload_logo")
+async def upload_logo_endpoint(data: dict):
+    global branding_config
+    logo_data = data.get("logo_data")
+    if not logo_data:
+        return JSONResponse(status_code=400, content={"error": "logo_data is required"})
+    branding_config["logo_url"] = logo_data
+    return {
+        "success": True,
+        "logo_url": branding_config["logo_url"],
+        "message": "อัปโหลดรูปภาพโลโก้สำเร็จ"
     }
 
 @app.get("/", response_class=HTMLResponse)
