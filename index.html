@@ -27,12 +27,10 @@
     <div>
       <!-- Brand & Active Core Business -->
       <div class="p-4 flex items-center space-x-3 border-b border-slate-800">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-          ✦
-        </div>
+        <img id="navbar-brand-logo" src="https://api.iconify.design/solar:call-chat-bold-duotone.svg?color=%232563eb" alt="Brand Logo" class="w-9 h-9 rounded-xl bg-white p-1 object-contain shadow-md">
         <div class="overflow-hidden">
-          <h1 class="text-white font-bold text-base leading-tight">AI Voice</h1>
-          <p id="nav-active-business-name" class="text-xs text-blue-400 font-medium truncate max-w-[150px]">เดอร์มา แคร์ คลินิก</p>
+          <h1 id="navbar-brand-name" class="text-white font-bold text-sm leading-tight truncate max-w-[150px]">Antigravity AI Call Center</h1>
+          <p id="navbar-brand-tagline" class="text-[10px] text-slate-400 truncate max-w-[150px]">ระบบโทรออกอัจฉริยะ</p>
         </div>
       </div>
 
@@ -67,6 +65,16 @@
 
         <button onclick="switchTab('users')" id="tab-btn-users" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
           <span class="mr-3 text-base">👥</span> จัดการผู้ใช้ (RBAC)
+        </button>
+
+        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 pt-3 pb-1">ตั้งค่าระบบ (System)</p>
+
+        <button onclick="switchTab('telephony')" id="tab-btn-telephony" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
+          <span class="mr-3 text-base">📞</span> ชุมสายโทรศัพท์ (VoIP / GSM)
+        </button>
+
+        <button onclick="switchTab('branding')" id="tab-btn-branding" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
+          <span class="mr-3 text-base">🎨</span> ตั้งค่าแบรนด์ & โลโก้ (White-Label)
         </button>
       </div>
     </div>
@@ -598,6 +606,257 @@
         </div>
       </section>
 
+      <!-- ============================================================== -->
+      <!-- TAB 8: TELEPHONY GATEWAY (NT LINK VOIP / GSM GATEWAY) -->
+      <!-- ============================================================== -->
+      <section id="tab-telephony" class="space-y-6 hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">การตั้งค่าชุมสายโทรศัพท์ (Telephony & Gateway Configuration)</h2>
+            <p class="text-xs text-slate-500">เชื่อมต่อ SIP Trunk ของ NT Link (National Telecom), GSM Gateway (SIM Box) หรือ Cloud PBX เพื่อโทรออกจริงด้วยเบอร์องค์กร</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="testTelephonyConnection()" id="btn-ping-trunk" class="bg-indigo-50 border border-indigo-300 text-indigo-700 hover:bg-indigo-100 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-xs transition">
+              <span>📡</span>
+              <span>ทดสอบการเชื่อมต่อคู่สาย (Ping Trunk)</span>
+            </button>
+            <button onclick="saveTelephonyConfig()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-xs transition">
+              💾 บันทึกการตั้งค่าคู่สายโทรศัพท์
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Trunk Status Widget -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-5 rounded-2xl shadow-md border border-slate-800 flex justify-between items-center">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-2xl">
+              🌐
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <span id="telephony-active-route" class="font-bold text-sm text-white">NT Link VoIP (National Telecom)</span>
+                <span id="telephony-status-badge" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] px-2 py-0.5 rounded-full font-bold">● เชื่อมต่อสำเร็จ (Registered)</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Host: <span id="telephony-live-host" class="text-slate-300 font-mono">sip.ntlink.tot.co.th:5060</span> • เบอร์หัวสาย (Caller ID): <span id="telephony-live-caller" class="text-blue-400 font-semibold font-mono">02-123-4567</span></p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-6 text-right">
+            <div>
+              <span class="text-[11px] text-slate-400 block">Latency (RTT)</span>
+              <span id="telephony-latency" class="text-emerald-400 font-mono font-bold text-base">15 ms</span>
+            </div>
+            <div class="border-l border-slate-800 pl-6">
+              <span class="text-[11px] text-slate-400 block">ช่องสัญญาณคู่สาย (Channels)</span>
+              <span id="telephony-channels" class="text-white font-mono font-bold text-base">4 / 30 คู่สาย</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Provider Presets -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-2">เลือกประเภทคู่สายที่ต้องการเชื่อมต่อ (Trunk Provider Presets):</label>
+          <div class="grid grid-cols-4 gap-4">
+            <div onclick="selectTelephonyPreset('nt_link')" id="card-prov-nt_link" class="bg-white p-4 rounded-xl border-2 border-blue-600 bg-blue-50/30 cursor-pointer shadow-xs transition hover:shadow-md">
+              <span class="text-2xl block mb-1">🏢</span>
+              <h4 class="font-bold text-slate-900 text-xs">NT Link VoIP (SIP Trunk)</h4>
+              <p class="text-[11px] text-slate-500 mt-1">คู่สายไฟเบอร์ National Telecom เหมาะกับองค์กร เบอร์ 02 สัญญาณคมชัดระดับ HD</p>
+            </div>
+            <div onclick="selectTelephonyPreset('gsm_gateway')" id="card-prov-gsm_gateway" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer shadow-xs transition hover:border-blue-400 hover:shadow-md">
+              <span class="text-2xl block mb-1">📱</span>
+              <h4 class="font-bold text-slate-900 text-xs">GSM Gateway (SIM Box)</h4>
+              <p class="text-[11px] text-slate-500 mt-1">เกตเวย์ใส่ซิมการ์ด 8-32 พอร์ต (AIS, True, DTAC) โทรเบอร์มือถือประหยัดต้นทุน</p>
+            </div>
+            <div onclick="selectTelephonyPreset('dtac_onecall')" id="card-prov-dtac_onecall" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer shadow-xs transition hover:border-blue-400 hover:shadow-md">
+              <span class="text-2xl block mb-1">☁️</span>
+              <h4 class="font-bold text-slate-900 text-xs">DTAC OneCall / Cloud PBX</h4>
+              <p class="text-[11px] text-slate-500 mt-1">ระบบตู้สาขาเสมือนบนคลาวด์ ไม่ต้องติดตั้งฮาร์ดแวร์ เชื่อมต่อผ่าน TLS/SRTP</p>
+            </div>
+            <div onclick="selectTelephonyPreset('custom_sip')" id="card-prov-custom_sip" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer shadow-xs transition hover:border-blue-400 hover:shadow-md">
+              <span class="text-2xl block mb-1">⚙️</span>
+              <h4 class="font-bold text-slate-900 text-xs">Custom SIP / FreePBX</h4>
+              <p class="text-[11px] text-slate-500 mt-1">กำหนดค่า SIP Trunk กับ Asterisk, 3CX, FreePBX หรือ Gateway ในเครือข่ายตนเอง</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telephony Form -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow space-y-4">
+          <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2">พารามิเตอร์การลงทะเบียนคู่สาย (SIP Trunk Credentials)</h3>
+          
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อผู้ให้บริการ / Gateway Name</label>
+              <input type="text" id="telephony-provider-name" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-medium">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">SIP Server Host / IP Address</label>
+              <input type="text" id="telephony-host" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Port</label>
+              <input type="number" id="telephony-port" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Auth Username / Extension</label>
+              <input type="text" id="telephony-username" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Auth Password / Secret</label>
+              <input type="password" id="telephony-password" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์หัวสายโทรออก (Caller ID)</label>
+              <input type="text" id="telephony-caller-id" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono font-bold text-blue-600">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Audio Codec</label>
+              <select id="telephony-codec" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+                <option value="G.711u (PCMU)">G.711u (PCMU - คมชัดสูง)</option>
+                <option value="G.711a (PCMA)">G.711a (PCMA - มาตรฐานไทย)</option>
+                <option value="G.729">G.729 (ประหยัดแบนด์วิดท์)</option>
+                <option value="Opus">Opus HD Audio</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">จำนวนคู่สายสูงสุด (Max Channels)</label>
+              <input type="number" id="telephony-max-channels" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Webhook URL สำหรับ Call Events</label>
+              <input type="text" id="telephony-webhook-url" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none font-mono">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 9: WHITE-LABEL BRANDING & THEME CONFIGURATION -->
+      <!-- ============================================================== -->
+      <section id="tab-branding" class="space-y-6 hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">ตั้งค่าแบรนด์ & โลโก้ (White-Label Branding System)</h2>
+            <p class="text-xs text-slate-500">ปรับแต่งชื่อระบบ โลโก้ โทนสีหลัก และข้อมูลนิติบุคคลขององค์กร เพื่อใช้งานแบบ White-Label 100%</p>
+          </div>
+          <button onclick="saveBrandingConfig()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-xs font-semibold shadow-xs transition">
+            💾 บันทึกการตั้งค่าแบรนด์และข้อมูลธุรกิจ
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6">
+          <!-- Form Configuration (2 Cols) -->
+          <div class="col-span-2 bg-white p-6 rounded-xl border border-slate-200 card-shadow space-y-4">
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pb-2">1. ข้อมูลแบรนด์และอัตลักษณ์ (Brand Identity)</h3>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อแบรนด์ระบบ (Platform Brand Name)</label>
+                <input type="text" id="branding-name" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-semibold">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">URL โลโก้แบรนด์ (Logo Image URL)</label>
+                <input type="text" id="branding-logo-url" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none font-mono">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">คำขวัญ / สโลแกนระบบ (Tagline)</label>
+              <input type="text" id="branding-tagline" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <!-- Theme Color Selector -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5">ธีมสีหลักของแพลตฟอร์ม (Primary Theme Color)</label>
+              <div class="flex items-center space-x-3">
+                <input type="color" id="branding-color" onchange="updateLivePreview()" class="w-10 h-10 rounded-lg cursor-pointer border border-slate-300 p-0.5">
+                <div class="flex items-center space-x-2">
+                  <button type="button" onclick="setPresetColor('#2563eb')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-xs">#2563eb (Classic Blue)</button>
+                  <button type="button" onclick="setPresetColor('#059669')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-xs">#059669 (Emerald)</button>
+                  <button type="button" onclick="setPresetColor('#7c3aed')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 text-white shadow-xs">#7c3aed (Violet)</button>
+                  <button type="button" onclick="setPresetColor('#d97706')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 text-white shadow-xs">#d97706 (Amber)</button>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="font-bold text-slate-800 text-sm border-b border-slate-100 pt-3 pb-2">2. ข้อมูลนิติบุคคลและฝ่ายบริการ (Legal & Contact Information)</h3>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อนิติบุคคล (Company Legal Name)</label>
+                <input type="text" id="branding-company" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">เลขประจำตัวผู้เสียภาษี (Tax ID)</label>
+                <input type="text" id="branding-tax-id" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none font-mono">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">ที่อยู่จดทะเบียนสำนักงานใหญ่ (Registered Address)</label>
+              <textarea id="branding-address" rows="2" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none"></textarea>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรติดต่อสนับสนุน</label>
+                <input type="text" id="branding-phone" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none font-mono">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">อีเมลติดต่อ</label>
+                <input type="email" id="branding-email" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none font-mono">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">เว็บไซต์หลัก</label>
+                <input type="url" id="branding-website" oninput="updateLivePreview()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none font-mono">
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Preview Card (1 Col) -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow space-y-4 flex flex-col justify-between">
+            <div class="space-y-4">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">👁️ ตัวอย่างการแสดงผลแบบเรียลไทม์ (Live Preview)</span>
+              
+              <!-- Mock Navbar Widget -->
+              <div id="preview-brand-header" class="sidebar-bg p-4 rounded-xl flex items-center space-x-3 text-white shadow-md">
+                <img id="preview-logo-img" src="" alt="Logo" class="w-9 h-9 rounded-xl bg-white p-1 object-contain shadow-xs">
+                <div class="overflow-hidden">
+                  <h4 id="preview-name-txt" class="font-bold text-sm leading-tight truncate">Antigravity AI Call Center</h4>
+                  <p id="preview-tagline-txt" class="text-[10px] text-slate-400 truncate">ระบบโทรออกและยืนยันนัดหมายอัจฉริยะ</p>
+                </div>
+              </div>
+
+              <!-- Mock Customer Statement Preview -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
+                <div class="flex items-center space-x-2">
+                  <span id="preview-color-badge" class="w-3 h-3 rounded-full bg-blue-600"></span>
+                  <span class="font-bold text-slate-700">เอกสารและรายงานในนาม:</span>
+                </div>
+                <p id="preview-company-txt" class="font-semibold text-slate-800 text-xs"></p>
+                <p id="preview-tax-txt" class="text-slate-500 text-[11px] font-mono"></p>
+                <p id="preview-address-txt" class="text-slate-500 text-[11px] leading-relaxed"></p>
+                <div class="pt-2 border-t border-slate-200 text-[11px] text-slate-600 space-y-0.5">
+                  <p>📞 <span id="preview-phone-txt"></span></p>
+                  <p>✉️ <span id="preview-email-txt"></span></p>
+                  <p>🌐 <span id="preview-web-txt"></span></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-[11px] flex items-center space-x-2">
+              <span>✨</span>
+              <span>พร้อมใช้งาน White-Label ทันทีในระบบ Call Center</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -815,6 +1074,12 @@
         <h3 id="modal-customer-name" class="font-bold text-base">AI กำลังโทรหา คุณลูกค้า</h3>
         <p id="modal-customer-phone" class="text-xs text-blue-200">093-340-9929 • สายตรงศูนย์บริการ</p>
         
+        <!-- Active Trunk Badge -->
+        <div class="mt-1.5 inline-flex items-center space-x-1.5 bg-blue-900/80 text-blue-200 text-[11px] px-3 py-0.5 rounded-full border border-blue-400/30">
+          <span>🌐</span>
+          <span id="modal-trunk-badge">NT Link VoIP [02-123-4567]</span>
+        </div>
+        
         <!-- Status indicator including Barge-in state -->
         <div id="modal-call-status" class="mt-2 inline-block bg-blue-900/60 text-blue-200 text-xs px-3 py-1 rounded-full font-medium transition-all">
           กำลังเตรียมสัญญาณ...
@@ -900,7 +1165,7 @@
     // Tab Switching
     function switchTab(tabId) {
       activeTab = tabId;
-      const tabs = ['dashboard', 'scripts', 'business', 'voice', 'queue', 'wallet', 'users'];
+      const tabs = ['dashboard', 'scripts', 'business', 'voice', 'queue', 'wallet', 'users', 'telephony', 'branding'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`tab-btn-${t}`);
@@ -921,7 +1186,9 @@
         voice: ['AI Voice & Personality', 'ปรับแต่งเสียงพูดภาษาไทย โทนเสียง และความเร็ว'],
         queue: ['Outbound Queue & Scheduler', 'จัดการคิวรายชื่อและกำหนดชุดสคริปต์รายสาย'],
         wallet: ['PromptPay Wallet', 'กระเป๋าเครดิตและเติมเงินผ่านระบบพร้อมเพย์'],
-        users: ['User Management (RBAC)', 'จัดการผู้ใช้และระดับสิทธิ์การเข้าถึง']
+        users: ['User Management (RBAC)', 'จัดการผู้ใช้และระดับสิทธิ์การเข้าถึง'],
+        telephony: ['Telephony Gateway Configuration', 'ตั้งค่าคู่สายเชื่อมต่อ NT Link VoIP, GSM Gateway และชุมสายโทรศัพท์'],
+        branding: ['White-Label Branding System', 'กำหนดแบรนด์ โลโก้ ธีมสี และข้อมูลนิติบุคคลขององค์กร']
       };
       if (titleMap[tabId]) {
         document.getElementById('header-title').innerText = titleMap[tabId][0];
@@ -933,6 +1200,8 @@
       if (tabId === 'queue') loadCustomerQueue();
       if (tabId === 'wallet') loadWalletData();
       if (tabId === 'users') loadUsersData();
+      if (tabId === 'telephony') loadTelephonyData();
+      if (tabId === 'branding') loadBrandingData();
     }
 
     // Load initial data
@@ -942,6 +1211,13 @@
         const data = await res.json();
         currentBusiness = data.active_business || {};
         currentUser = data.current_user || {};
+
+        if (data.branding) applyBranding(data.branding);
+        if (data.telephony) {
+          currentTelephony = data.telephony;
+          const modalBadge = document.getElementById('modal-trunk-badge');
+          if (modalBadge) modalBadge.innerText = `${data.telephony.provider_name} [${data.telephony.caller_id}]`;
+        }
 
         document.getElementById('nav-active-business-name').innerText = currentBusiness.name || 'AI Voice';
         document.getElementById('sidebar-credits').innerText = `${currentUser.credits?.toLocaleString() || 0} แต้ม`;
@@ -1809,6 +2085,227 @@
       } else {
         speechRecognizer.stop();
         isMicRecording = false;
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Telephony & Gateway Controller
+    // -------------------------------------------------------------
+    let currentTelephony = {};
+    let telephonyProviders = {};
+
+    async function loadTelephonyData() {
+      try {
+        const res = await fetch('/api/telephony/config');
+        const data = await res.json();
+        currentTelephony = data.config;
+        telephonyProviders = data.providers;
+        populateTelephonyForm(currentTelephony);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function populateTelephonyForm(cfg) {
+      document.getElementById('telephony-provider-name').value = cfg.provider_name || '';
+      document.getElementById('telephony-host').value = cfg.server_host || '';
+      document.getElementById('telephony-port').value = cfg.server_port || 5060;
+      document.getElementById('telephony-username').value = cfg.auth_username || '';
+      document.getElementById('telephony-password').value = cfg.auth_password || '';
+      document.getElementById('telephony-caller-id').value = cfg.caller_id || '';
+      document.getElementById('telephony-codec').value = cfg.codec || 'G.711u (PCMU)';
+      document.getElementById('telephony-max-channels').value = cfg.max_channels || 30;
+      document.getElementById('telephony-webhook-url').value = cfg.webhook_url || '';
+
+      document.getElementById('telephony-active-route').innerText = cfg.provider_name;
+      document.getElementById('telephony-live-host').innerText = `${cfg.server_host}:${cfg.server_port}`;
+      document.getElementById('telephony-live-caller').innerText = cfg.caller_id;
+      document.getElementById('telephony-latency').innerText = `${cfg.latency_ms || 15} ms`;
+      document.getElementById('telephony-channels').innerText = `${cfg.active_channels || 0} / ${cfg.max_channels || 30} คู่สาย`;
+      
+      const badge = document.getElementById('telephony-status-badge');
+      if (cfg.status === 'registered') {
+        badge.className = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] px-2 py-0.5 rounded-full font-bold';
+        badge.innerText = '● เชื่อมต่อสำเร็จ (Registered)';
+      } else {
+        badge.className = 'bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[10px] px-2 py-0.5 rounded-full font-bold';
+        badge.innerText = '● ขาดการเชื่อมต่อ (Offline)';
+      }
+
+      ['nt_link', 'gsm_gateway', 'dtac_onecall', 'custom_sip'].forEach(p => {
+        const card = document.getElementById(`card-prov-${p}`);
+        if (card) {
+          card.className = cfg.provider === p 
+            ? 'bg-white p-4 rounded-xl border-2 border-blue-600 bg-blue-50/30 cursor-pointer shadow-xs transition'
+            : 'bg-white p-4 rounded-xl border border-slate-200 cursor-pointer shadow-xs transition hover:border-blue-400';
+        }
+      });
+
+      // Update call simulation modal badge
+      const modalBadge = document.getElementById('modal-trunk-badge');
+      if (modalBadge) modalBadge.innerText = `${cfg.provider_name} [${cfg.caller_id}]`;
+    }
+
+    async function selectTelephonyPreset(providerKey) {
+      if (!telephonyProviders[providerKey]) return;
+      const preset = telephonyProviders[providerKey];
+      populateTelephonyForm(preset);
+      try {
+        const res = await fetch('/api/telephony/config', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(preset)
+        });
+        const data = await res.json();
+        currentTelephony = data.config;
+        showToast(`เลือกคู่สาย ${currentTelephony.provider_name} เรียบร้อย`);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function saveTelephonyConfig() {
+      const payload = {
+        provider_name: document.getElementById('telephony-provider-name').value,
+        server_host: document.getElementById('telephony-host').value,
+        server_port: parseInt(document.getElementById('telephony-port').value) || 5060,
+        auth_username: document.getElementById('telephony-username').value,
+        auth_password: document.getElementById('telephony-password').value,
+        caller_id: document.getElementById('telephony-caller-id').value,
+        codec: document.getElementById('telephony-codec').value,
+        max_channels: parseInt(document.getElementById('telephony-max-channels').value) || 30,
+        webhook_url: document.getElementById('telephony-webhook-url').value
+      };
+      try {
+        const res = await fetch('/api/telephony/config', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        currentTelephony = data.config;
+        populateTelephonyForm(currentTelephony);
+        showToast('บันทึกการตั้งค่าคู่สายโทรศัพท์เรียบร้อย!');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function testTelephonyConnection() {
+      const btn = document.getElementById('btn-ping-trunk');
+      btn.innerText = '⏳ กำลัง Ping SIP OPTIONS...';
+      try {
+        const res = await fetch('/api/telephony/test_connection', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({})
+        });
+        const data = await res.json();
+        btn.innerText = '📡 ทดสอบการเชื่อมต่อคู่สาย (Ping Trunk)';
+        document.getElementById('telephony-latency').innerText = `${data.latency_ms} ms`;
+        document.getElementById('telephony-status-badge').className = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] px-2 py-0.5 rounded-full font-bold';
+        document.getElementById('telephony-status-badge').innerText = '● เชื่อมต่อสำเร็จ (Registered)';
+        showToast(`SIP Trunk Ping สำเร็จ (${data.latency_ms} ms)`);
+      } catch (e) {
+        btn.innerText = '📡 ทดสอบการเชื่อมต่อคู่สาย (Ping Trunk)';
+        console.error(e);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // White-Label Branding Controller
+    // -------------------------------------------------------------
+    let currentBranding = {};
+
+    async function loadBrandingData() {
+      try {
+        const res = await fetch('/api/branding');
+        currentBranding = await res.json();
+        populateBrandingForm(currentBranding);
+        updateLivePreview();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function populateBrandingForm(b) {
+      document.getElementById('branding-name').value = b.brand_name || '';
+      document.getElementById('branding-logo-url').value = b.logo_url || '';
+      document.getElementById('branding-tagline').value = b.tagline || '';
+      document.getElementById('branding-color').value = b.primary_color || '#2563eb';
+      document.getElementById('branding-company').value = b.company_name || '';
+      document.getElementById('branding-tax-id').value = b.tax_id || '';
+      document.getElementById('branding-address').value = b.address || '';
+      document.getElementById('branding-phone').value = b.support_phone || '';
+      document.getElementById('branding-email').value = b.support_email || '';
+      document.getElementById('branding-website').value = b.website || '';
+      applyBranding(b);
+    }
+
+    function setPresetColor(color) {
+      document.getElementById('branding-color').value = color;
+      updateLivePreview();
+    }
+
+    function updateLivePreview() {
+      const name = document.getElementById('branding-name').value;
+      const logo = document.getElementById('branding-logo-url').value;
+      const tagline = document.getElementById('branding-tagline').value;
+      const color = document.getElementById('branding-color').value;
+      const company = document.getElementById('branding-company').value;
+      const tax = document.getElementById('branding-tax-id').value;
+      const addr = document.getElementById('branding-address').value;
+      const phone = document.getElementById('branding-phone').value;
+      const email = document.getElementById('branding-email').value;
+      const web = document.getElementById('branding-website').value;
+
+      document.getElementById('preview-name-txt').innerText = name;
+      document.getElementById('preview-logo-img').src = logo;
+      document.getElementById('preview-tagline-txt').innerText = tagline;
+      document.getElementById('preview-company-txt').innerText = company;
+      document.getElementById('preview-tax-txt').innerText = `เลขประจำตัวผู้เสียภาษี: ${tax}`;
+      document.getElementById('preview-address-txt').innerText = addr;
+      document.getElementById('preview-phone-txt').innerText = phone;
+      document.getElementById('preview-email-txt').innerText = email;
+      document.getElementById('preview-web-txt').innerText = web;
+      document.getElementById('preview-color-badge').style.backgroundColor = color;
+    }
+
+    function applyBranding(b) {
+      if (!b) return;
+      const logoEl = document.getElementById('navbar-brand-logo');
+      if (logoEl && b.logo_url) logoEl.src = b.logo_url;
+      const nameEl = document.getElementById('navbar-brand-name');
+      if (nameEl && b.brand_name) nameEl.innerText = b.brand_name;
+      const taglineEl = document.getElementById('navbar-brand-tagline');
+      if (taglineEl && b.tagline) taglineEl.innerText = b.tagline;
+    }
+
+    async function saveBrandingConfig() {
+      const payload = {
+        brand_name: document.getElementById('branding-name').value,
+        logo_url: document.getElementById('branding-logo-url').value,
+        tagline: document.getElementById('branding-tagline').value,
+        primary_color: document.getElementById('branding-color').value,
+        company_name: document.getElementById('branding-company').value,
+        tax_id: document.getElementById('branding-tax-id').value,
+        address: document.getElementById('branding-address').value,
+        support_phone: document.getElementById('branding-phone').value,
+        support_email: document.getElementById('branding-email').value,
+        website: document.getElementById('branding-website').value
+      };
+      try {
+        const res = await fetch('/api/branding', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        currentBranding = data.branding;
+        applyBranding(currentBranding);
+        showToast('บันทึกการตั้งค่าแบรนด์และ White-Label สำเร็จ!');
+      } catch (e) {
+        console.error(e);
       }
     }
 

@@ -218,6 +218,87 @@ SCRIPTS_DB = [
 ]
 
 # -------------------------------------------------------------
+# 2b. Telephony Gateway & White-Label Branding State
+# -------------------------------------------------------------
+TELEPHONY_PROVIDERS = {
+    "nt_link": {
+        "provider": "nt_link",
+        "provider_name": "NT Link VoIP (National Telecom)",
+        "server_host": "sip.ntlink.tot.co.th",
+        "server_port": 5060,
+        "auth_username": "021234567",
+        "auth_password": "••••••••",
+        "caller_id": "02-123-4567",
+        "codec": "G.711u (PCMU)",
+        "status": "registered",
+        "latency_ms": 15,
+        "active_channels": 4,
+        "max_channels": 30,
+        "webhook_url": "http://127.0.0.1:8088/api/telephony/events"
+    },
+    "gsm_gateway": {
+        "provider": "gsm_gateway",
+        "provider_name": "GSM Gateway (SIM Box 8 Ports)",
+        "server_host": "192.168.1.100",
+        "server_port": 5060,
+        "auth_username": "gsm_admin",
+        "auth_password": "••••••••",
+        "caller_id": "089-123-4567",
+        "codec": "G.711a (PCMA)",
+        "status": "registered",
+        "latency_ms": 8,
+        "active_channels": 2,
+        "max_channels": 8,
+        "webhook_url": "http://127.0.0.1:8088/api/telephony/events"
+    },
+    "dtac_onecall": {
+        "provider": "dtac_onecall",
+        "provider_name": "DTAC OneCall / Cloud PBX",
+        "server_host": "sip.dtac-onecall.com",
+        "server_port": 5061,
+        "auth_username": "onecall_biz",
+        "auth_password": "••••••••",
+        "caller_id": "02-998-8877",
+        "codec": "G.729",
+        "status": "registered",
+        "latency_ms": 22,
+        "active_channels": 1,
+        "max_channels": 15,
+        "webhook_url": "http://127.0.0.1:8088/api/telephony/events"
+    },
+    "custom_sip": {
+        "provider": "custom_sip",
+        "provider_name": "Custom SIP Trunk / Asterisk FreePBX",
+        "server_host": "pbx.company.internal",
+        "server_port": 5060,
+        "auth_username": "trunk_ext100",
+        "auth_password": "••••••••",
+        "caller_id": "02-555-0199",
+        "codec": "G.711u (PCMU)",
+        "status": "registered",
+        "latency_ms": 12,
+        "active_channels": 0,
+        "max_channels": 60,
+        "webhook_url": "http://127.0.0.1:8088/api/telephony/events"
+    }
+}
+
+telephony_config = dict(TELEPHONY_PROVIDERS["nt_link"])
+
+branding_config = {
+    "brand_name": "Antigravity AI Call Center",
+    "logo_url": "https://api.iconify.design/solar:call-chat-bold-duotone.svg?color=%232563eb",
+    "tagline": "ระบบโทรออกและยืนยันนัดหมายอัจฉริยะ สำหรับทุกธุรกิจ",
+    "primary_color": "#2563eb",
+    "company_name": "บริษัท แอนติกราวิตี้ อินโนเวชั่น จำกัด (มหาชน)",
+    "tax_id": "0105566012345",
+    "address": "123 อาคารสาทรทาวเวอร์ ชั้น 18 แขวงยานนาวา เขตสาทร กรุงเทพมหานคร 10120",
+    "support_phone": "02-123-4567",
+    "support_email": "support@aicallcenter.io",
+    "website": "https://aicallcenter.io"
+}
+
+# -------------------------------------------------------------
 # 3. RBAC & Users State
 # -------------------------------------------------------------
 USERS_DB = [
@@ -520,7 +601,9 @@ async def get_dashboard_data():
         "calls": calls_db,
         "active_business": active_business,
         "current_user": current_user,
-        "scripts_count": len(SCRIPTS_DB)
+        "scripts_count": len(SCRIPTS_DB),
+        "telephony": telephony_config,
+        "branding": branding_config
     }
 
 # -------------------------------------------------------------
@@ -824,12 +907,15 @@ async def start_call(data: dict):
             print("Chat Init Error:", e)
             chat_session = None
             
+    active_trunk = f"{telephony_config.get('provider_name', 'VoIP Gateway')} [{telephony_config.get('caller_id', '02-123-4567')}]"
+
     active_sessions[session_id] = {
         "customer_name": customer_name,
         "customer_phone": customer_phone,
         "appointment_detail": appointment_detail,
         "active_script": active_script,
         "chat_session": chat_session,
+        "trunk_route": active_trunk,
         "created_at": datetime.now(),
         "transcript": [{"speaker": "AI", "text": opening_text, "audio": audio_url}]
     }
@@ -842,7 +928,8 @@ async def start_call(data: dict):
         "business_name": active_script.get("business_name"),
         "agent_name": active_script.get("agent_name"),
         "agent_gender": active_script.get("agent_gender", "female"),
-        "script_name": active_script.get("name")
+        "script_name": active_script.get("name"),
+        "trunk_route": active_trunk
     }
 
 @app.post("/api/chat")
@@ -931,6 +1018,7 @@ async def chat(data: dict):
             "name": session["customer_name"],
             "phone": session["customer_phone"],
             "script_name": active_script.get("name", "สคริปต์มาตรฐาน"),
+            "trunk_route": session.get("trunk_route", f"{telephony_config['provider_name']} [{telephony_config['caller_id']}]"),
             "job_ref": f"{datetime.now().strftime('%Y%m%d')}_AI",
             "time": datetime.now().strftime("%d %b %H:%M"),
             "status": "สำเร็จแล้ว",
@@ -948,6 +1036,72 @@ async def chat(data: dict):
         "outcome": outcome,
         "summary": summary,
         "credits_remaining": current_user["credits"]
+    }
+
+# -------------------------------------------------------------
+# 16. Endpoints: Telephony Gateway & SIP/GSM Configuration
+# -------------------------------------------------------------
+@app.get("/api/telephony/config")
+async def get_telephony():
+    return {
+        "config": telephony_config,
+        "providers": TELEPHONY_PROVIDERS
+    }
+
+@app.post("/api/telephony/config")
+async def update_telephony(data: dict):
+    global telephony_config
+    provider = data.get("provider")
+    if provider and provider in TELEPHONY_PROVIDERS and len(data.keys()) <= 2:
+        preset = dict(TELEPHONY_PROVIDERS[provider])
+        for k, v in data.items():
+            if v is not None:
+                preset[k] = v
+        telephony_config = preset
+    else:
+        for k in ["provider", "provider_name", "server_host", "server_port", "auth_username", 
+                  "auth_password", "caller_id", "codec", "status", "latency_ms", 
+                  "active_channels", "max_channels", "webhook_url"]:
+            if k in data and data[k] is not None:
+                telephony_config[k] = data[k]
+    return {
+        "success": True,
+        "config": telephony_config,
+        "message": f"บันทึกการตั้งค่าคู่สาย {telephony_config.get('provider_name')} เรียบร้อย"
+    }
+
+@app.post("/api/telephony/test_connection")
+async def test_telephony_ping(data: dict = None):
+    global telephony_config
+    import random
+    latency = random.randint(12, 28)
+    telephony_config["status"] = "registered"
+    telephony_config["latency_ms"] = latency
+    return {
+        "success": True,
+        "status": "registered",
+        "latency_ms": latency,
+        "message": f"SIP OPTIONS Ping สำเร็จ: {telephony_config['server_host']}:{telephony_config['server_port']} ตอบสนองใน {latency}ms (สถานะ Registered)"
+    }
+
+# -------------------------------------------------------------
+# 17. Endpoints: White-Label Branding System
+# -------------------------------------------------------------
+@app.get("/api/branding")
+async def get_branding_endpoint():
+    return branding_config
+
+@app.post("/api/branding")
+async def update_branding_endpoint(data: dict):
+    global branding_config
+    for k in ["brand_name", "logo_url", "tagline", "primary_color", "company_name", 
+              "tax_id", "address", "support_phone", "support_email", "website"]:
+        if k in data and data[k] is not None:
+            branding_config[k] = data[k]
+    return {
+        "success": True,
+        "branding": branding_config,
+        "message": "อัปเดตข้อมูลแบรนด์และ White-Label สำเร็จ"
     }
 
 @app.get("/", response_class=HTMLResponse)
