@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Voice - Campaign Report & Live Call Center Simulator</title>
+  <title>AI Voice Call Center - Multi-Tenant SaaS Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -12,9 +12,7 @@
     body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; color: #1e293b; }
     .sidebar-bg { background-color: #0b1437; }
     .card-shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03); }
-    .pulse-ring {
-      animation: pulse-border 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-    }
+    .pulse-ring { animation: pulse-border 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite; }
     @keyframes pulse-border {
       0% { transform: scale(1); opacity: 0.8; }
       50% { transform: scale(1.15); opacity: 0.3; }
@@ -24,313 +22,811 @@
 </head>
 <body class="flex h-screen overflow-hidden text-sm">
 
-  <!-- SIDEBAR (Matching Screenshot) -->
+  <!-- SIDEBAR NAVIGATION -->
   <aside class="w-64 sidebar-bg text-slate-300 flex flex-col justify-between shrink-0">
     <div>
-      <!-- Brand -->
+      <!-- Brand & Active Core Business -->
       <div class="p-4 flex items-center space-x-3 border-b border-slate-800">
-        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
           ✦
         </div>
-        <div>
+        <div class="overflow-hidden">
           <h1 class="text-white font-bold text-base leading-tight">AI Voice</h1>
-          <p class="text-xs text-slate-400">DEMOCOM</p>
+          <p id="nav-active-business-name" class="text-xs text-blue-400 font-medium truncate max-w-[150px]">เดอร์มา แคร์ คลินิก</p>
         </div>
       </div>
 
-      <!-- Menu Section -->
+      <!-- Tab Buttons -->
       <div class="px-3 py-4 space-y-1">
-        <p class="text-xs font-semibold text-slate-400 px-3 py-1">งานประจำวัน</p>
-        <a href="#" class="flex items-center px-3 py-2 text-slate-300 hover:bg-slate-800/60 rounded-lg">
-          <span class="mr-3 text-base">📊</span> ภาพรวม
-        </a>
-        <a href="#" class="flex items-center px-3 py-2 bg-blue-600/20 text-blue-400 font-medium rounded-lg border-l-4 border-blue-500">
-          <span class="mr-3 text-base">📢</span> Campaigns
-        </a>
-        <a href="#" class="flex items-center justify-between px-3 py-2 text-slate-300 hover:bg-slate-800/60 rounded-lg">
-          <div class="flex items-center"><span class="mr-3 text-base">📋</span> เคสที่ต้องติดตาม</div>
-          <span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">41</span>
-        </a>
-        <a href="#" class="flex items-center justify-between px-3 py-2 text-slate-300 hover:bg-slate-800/60 rounded-lg">
-          <div class="flex items-center"><span class="mr-3 text-base">⚠️</span> เคสที่โทรไม่สำเร็จ</div>
-          <span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">5</span>
-        </a>
-        <a href="#" class="flex items-center justify-between px-3 py-2 text-slate-300 hover:bg-slate-800/60 rounded-lg">
-          <div class="flex items-center"><span class="mr-3 text-base">❓</span> คำถามที่ AI ยังตอบไม่ได้</div>
-          <span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">2</span>
-        </a>
-        <a href="#" class="flex items-center px-3 py-2 text-slate-300 hover:bg-slate-800/60 rounded-lg">
-          <span class="mr-3 text-base">📞</span> Call Out History
-        </a>
-        <a href="#" class="flex items-center justify-between px-3 py-2 text-slate-300 hover:bg-slate-800/60 rounded-lg">
-          <div class="flex items-center"><span class="mr-3 text-base">📲</span> Call In History</div>
-          <span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">3</span>
-        </a>
+        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-1">เมนูหลัก (Modules)</p>
+        
+        <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="w-full flex items-center px-3 py-2.5 bg-blue-600/20 text-blue-400 font-semibold rounded-lg border-l-4 border-blue-500 transition">
+          <span class="mr-3 text-base">📊</span> แดชบอร์ด & รายงาน
+        </button>
+
+        <button onclick="switchTab('business')" id="tab-btn-business" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
+          <span class="mr-3 text-base">🏢</span> ตั้งค่าธุรกิจ (Core Business)
+        </button>
+
+        <button onclick="switchTab('voice')" id="tab-btn-voice" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
+          <span class="mr-3 text-base">🎙️</span> เสียงพูด AI (Voice & Tone)
+        </button>
+
+        <button onclick="switchTab('queue')" id="tab-btn-queue" class="w-full flex items-center justify-between px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
+          <div class="flex items-center"><span class="mr-3 text-base">📅</span> คิวโทร & ตั้งเวลา</div>
+          <span id="badge-queue-count" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">3</span>
+        </button>
+
+        <button onclick="switchTab('wallet')" id="tab-btn-wallet" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
+          <span class="mr-3 text-base">💳</span> กระเป๋าเครดิต (PromptPay)
+        </button>
+
+        <button onclick="switchTab('users')" id="tab-btn-users" class="w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition">
+          <span class="mr-3 text-base">👥</span> จัดการผู้ใช้ (RBAC)
+        </button>
       </div>
     </div>
 
-    <!-- Bottom Credits & Account -->
+    <!-- Bottom Credits & Current User -->
     <div class="p-3 border-t border-slate-800 text-xs space-y-2">
-      <div class="flex items-center justify-between bg-slate-800/50 p-2 rounded-lg">
-        <span class="text-slate-400">เครดิตโทร</span>
-        <span class="text-blue-400 font-bold">1,878 แต้ม</span>
+      <div class="flex items-center justify-between bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
+        <div>
+          <span class="text-slate-400 block text-[11px]">เครดิตคงเหลือ</span>
+          <span id="sidebar-credits" class="text-emerald-400 font-bold text-sm">1,878 แต้ม</span>
+        </div>
+        <button onclick="switchTab('wallet')" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded text-[11px] font-semibold transition">
+          + เติมเงิน
+        </button>
       </div>
-      <div class="flex items-center space-x-2 text-slate-400 px-1">
-        <div class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white text-xs">M</div>
-        <span>DEMOCOM Work</span>
+      <div class="flex items-center space-x-2 text-slate-400 px-1 py-1">
+        <div id="sidebar-user-avatar" class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xs">
+          O
+        </div>
+        <div class="overflow-hidden">
+          <p id="sidebar-user-name" class="text-white font-medium text-xs truncate">เจ้าของธุรกิจ</p>
+          <p id="sidebar-user-role" class="text-[10px] text-blue-400">🏢 Business Owner</p>
+        </div>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT AREA -->
+  <!-- MAIN VIEWPORT -->
   <main class="flex-1 flex flex-col overflow-y-auto">
-    <!-- Top Nav -->
-    <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0">
-      <div class="flex items-center space-x-2 text-slate-600">
-        <span class="font-bold text-slate-800 text-base">Campaign Report</span>
-        <span class="text-slate-400">/</span>
-        <span class="text-slate-500">แจ้งเตือนเข้ารับบริการคลินิก (Job: 20261030_1)</span>
-      </div>
+    
+    <!-- Top Navigation Header with Role Switcher & Live Actions -->
+    <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-30">
       <div class="flex items-center space-x-3">
-        <button onclick="openCallModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 shadow-sm transition">
-          <span class="text-base">📞</span>
-          <span>จำลองการโทรออก (Simulate Call)</span>
+        <span id="header-title" class="font-bold text-slate-800 text-base">Campaign Report</span>
+        <span class="text-slate-300">|</span>
+        <span id="header-subtitle" class="text-xs text-slate-500">ระบบโทรแจ้งเตือนและคอนเฟิร์มนัดหมายอัตโนมัติ</span>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <!-- Role Switcher -->
+        <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
+          <span class="text-[11px] text-slate-500 px-2 font-medium">สลับบทบาท:</span>
+          <select id="select-role-switch" onchange="onRoleChanged(this.value)" class="bg-white border border-slate-300 text-xs font-semibold text-slate-700 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <option value="owner">🏢 Business Owner (เจ้าของ)</option>
+            <option value="admin">👑 Super Admin (ผู้ดูแลระบบ)</option>
+            <option value="staff">👤 Staff / Client (พนักงาน)</option>
+          </select>
+        </div>
+
+        <!-- Quick Top-up Button -->
+        <button onclick="switchTab('wallet')" class="bg-emerald-50 border border-emerald-300 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
+          <span>💳</span>
+          <span>พร้อมเพย์ (<span id="top-credits-count">1,878</span>)</span>
         </button>
-        <button class="border border-slate-300 text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-50 text-xs font-medium flex items-center space-x-1">
-          <span>📥</span> <span>ส่งออก CSV</span>
+
+        <!-- Simulate Call Trigger -->
+        <button onclick="openCallModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg font-medium text-xs flex items-center space-x-2 shadow-sm transition">
+          <span class="text-sm">📞</span>
+          <span>จำลองการโทรออก (Simulate Call)</span>
         </button>
       </div>
     </header>
 
-    <!-- Content Body -->
-    <div class="p-6 space-y-6">
+    <!-- CONTENT TABS CONTAINER -->
+    <div class="p-6">
 
-      <!-- Header Pills -->
-      <div class="flex justify-between items-center">
+      <!-- ============================================================== -->
+      <!-- TAB 1: CAMPAIGN DASHBOARD (Reference UI) -->
+      <!-- ============================================================== -->
+      <section id="tab-dashboard" class="space-y-6">
+        <!-- Header Filters -->
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">รายงานการโทรประจำวัน</h2>
+            <p class="text-xs text-slate-500">สถิติสายโทรออกอัตโนมัติ สรุปผลลัพธ์และวิเคราะห์บทสนทนาโดย AI</p>
+          </div>
+          <div class="flex bg-slate-200 p-1 rounded-lg text-xs font-medium text-slate-600">
+            <button class="bg-white text-blue-600 px-3 py-1 rounded shadow-xs font-bold">ทั้งหมด</button>
+            <button class="px-3 py-1 hover:text-slate-900">30 วัน</button>
+            <button class="px-3 py-1 hover:text-slate-900">7 วัน</button>
+            <button class="px-3 py-1 hover:text-slate-900">วันนี้</button>
+          </div>
+        </div>
+
+        <!-- Metric Cards Row -->
+        <div class="grid grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+            <p class="text-xs text-slate-500 font-medium">ทั้งหมดที่ต้องโทร</p>
+            <div class="mt-2 flex items-baseline space-x-2">
+              <span id="stat-total" class="text-3xl font-bold text-slate-900">22</span>
+              <span class="text-xs text-slate-400">2 Job</span>
+            </div>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+            <div class="flex justify-between items-center">
+              <p class="text-xs text-slate-500 font-medium">ตอบแล้ว</p>
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            </div>
+            <div class="mt-2 flex items-baseline space-x-2">
+              <span id="stat-answered" class="text-3xl font-bold text-slate-900">21</span>
+              <span id="stat-answered-percent" class="text-xs text-emerald-600 font-semibold">95.5%</span>
+            </div>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+            <div class="flex justify-between items-center">
+              <p class="text-xs text-slate-500 font-medium">รอโทรตามคิว</p>
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            </div>
+            <div class="mt-2 flex items-baseline space-x-2">
+              <span id="stat-pending" class="text-3xl font-bold text-slate-900">3</span>
+              <span class="text-xs text-slate-400">คิวคงเหลือ</span>
+            </div>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+            <div class="flex justify-between items-center">
+              <p class="text-xs text-slate-500 font-medium">ติดต่อไม่ได้</p>
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            </div>
+            <div class="mt-2 flex items-baseline space-x-2">
+              <span id="stat-unreachable" class="text-3xl font-bold text-slate-900">1</span>
+              <span class="text-xs text-rose-600 font-semibold">4.5%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="space-y-1">
+          <div class="w-full h-2.5 bg-rose-400 rounded-full overflow-hidden flex">
+            <div id="bar-green" style="width: 95.5%;" class="h-full bg-emerald-500 transition-all duration-500"></div>
+            <div id="bar-red" style="width: 4.5%;" class="h-full bg-rose-500"></div>
+          </div>
+          <div class="flex items-center space-x-4 text-xs text-slate-500">
+            <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span> ตอบแล้ว 21</span>
+            <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-rose-500 mr-1.5"></span> ติดต่อไม่ได้ 1</span>
+          </div>
+        </div>
+
+        <!-- Outcomes Breakdown -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow">
+            <h3 class="font-bold text-slate-800 text-sm mb-3">เคสการติดตาม</h3>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <p class="text-xs text-slate-500">เคสที่ต้องติดตาม</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">6</p>
+                <p class="text-[11px] text-amber-600 mt-1">ค้างเกิน 24 ชม.: 6</p>
+              </div>
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <p class="text-xs text-slate-500">เคสที่ปิดแล้ว</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">0</p>
+                <p class="text-[11px] text-slate-400 mt-1">สำเร็จสมบูรณ์</p>
+              </div>
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <p class="text-xs text-slate-500">เคสที่โทรไม่สำเร็จ</p>
+                <p class="text-2xl font-bold text-rose-600 mt-1">1</p>
+                <p class="text-[11px] text-slate-400 mt-1">ยังไม่เปิดสาย</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow">
+            <h3 class="font-bold text-slate-800 text-sm mb-3">ผลลัพธ์การสนทนา</h3>
+            <div class="grid grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs text-slate-600 font-medium">
+                  <span>ผลการนัด</span>
+                  <span class="text-slate-400">ตอบ 12 จาก 21</span>
+                </div>
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="w-16 text-slate-600">มาตามนัด</span>
+                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div style="width: 58%;" class="h-full bg-blue-600"></div>
+                    </div>
+                    <span id="num-attended" class="font-bold text-slate-700 w-4 text-right">7</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="w-16 text-slate-600">ขอเลื่อนนัด</span>
+                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div style="width: 33%;" class="h-full bg-blue-500"></div>
+                    </div>
+                    <span id="num-rescheduled" class="font-bold text-slate-700 w-4 text-right">4</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="w-16 text-slate-600">ยกเลิกนัด</span>
+                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div style="width: 10%;" class="h-full bg-blue-400"></div>
+                    </div>
+                    <span id="num-cancelled" class="font-bold text-slate-700 w-4 text-right">1</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs text-slate-600 font-medium">
+                  <span>ได้วันเวลานัดใหม่</span>
+                  <span class="text-slate-400">ตอบ 5 จาก 21</span>
+                </div>
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="w-16 text-slate-600">ใช่</span>
+                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div style="width: 60%;" class="h-full bg-indigo-600"></div>
+                    </div>
+                    <span class="font-bold text-slate-700 w-4 text-right">3</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="w-16 text-slate-600">ไม่ใช่</span>
+                    <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div style="width: 40%;" class="h-full bg-indigo-400"></div>
+                    </div>
+                    <span class="font-bold text-slate-700 w-4 text-right">2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Call Out History Table -->
+        <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 text-base">ผลการโทรล่าสุด (Call Out History)</h3>
+            <span class="text-xs text-slate-500">บันทึกเสียงและถอดเทปสนทนาเรียลไทม์ (หัก 1 เครดิต/สาย)</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50/80 text-xs text-slate-500 font-semibold border-b border-slate-200">
+                  <th class="py-3 px-4">ชื่อ / เบอร์</th>
+                  <th class="py-3 px-4">Job / Ref</th>
+                  <th class="py-3 px-4">สถานะ / เวลาคุย</th>
+                  <th class="py-3 px-4">ผลการนัด</th>
+                  <th class="py-3 px-4">ได้วันเวลานัดใหม่</th>
+                  <th class="py-3 px-4 w-1/3">สรุปตามสาย (AI Summary)</th>
+                  <th class="py-3 px-4 text-center">ฟัง / โทร</th>
+                </tr>
+              </thead>
+              <tbody id="table-calls" class="divide-y divide-slate-100 text-xs">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 2: CORE BUSINESS CONFIGURATION -->
+      <!-- ============================================================== -->
+      <section id="tab-business" class="space-y-6 hidden">
         <div>
-          <h2 class="text-xl font-bold text-slate-800">รายงานการโทรประจำวัน</h2>
-          <p class="text-xs text-slate-500">สถิติสายโทรออกอัตโนมัติ สรุปผลลัพธ์และวิเคราะห์บทสนทนาโดย AI</p>
+          <h2 class="text-xl font-bold text-slate-800">ตั้งค่าธุรกิจ (Core Business Setup)</h2>
+          <p class="text-xs text-slate-500">เลือกประเภทธุรกิจและระบุข้อมูลเฉพาะทาง เพื่อให้ AI สวมบทบาทและใช้ภาษาตรงกับอุตสาหกรรมของคุณ</p>
         </div>
-        <div class="flex bg-slate-200 p-1 rounded-lg text-xs font-medium text-slate-600">
-          <button class="bg-white text-blue-600 px-3 py-1 rounded shadow-xs font-bold">ทั้งหมด</button>
-          <button class="px-3 py-1 hover:text-slate-900">30 วัน</button>
-          <button class="px-3 py-1 hover:text-slate-900">7 วัน</button>
-          <button class="px-3 py-1 hover:text-slate-900">วันนี้</button>
-        </div>
-      </div>
 
-      <!-- METRIC CARDS ROW (Exact match to screenshot 1) -->
-      <div class="grid grid-cols-4 gap-4">
-        <!-- Card 1 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
-          <p class="text-xs text-slate-500 font-medium">ทั้งหมดที่ต้องโทร</p>
-          <div class="mt-2 flex items-baseline space-x-2">
-            <span id="stat-total" class="text-3xl font-bold text-slate-900">22</span>
-            <span class="text-xs text-slate-400">2 Job</span>
+        <!-- Industry Template Cards -->
+        <div class="grid grid-cols-5 gap-3">
+          <!-- Clinic -->
+          <div onclick="selectIndustryTemplate('clinic')" id="card-tmpl-clinic" class="bg-white p-4 rounded-xl border-2 border-blue-600 bg-blue-50/30 cursor-pointer hover:shadow-md transition card-shadow">
+            <span class="text-2xl block mb-2">🏥</span>
+            <h4 class="font-bold text-slate-800 text-xs">คลินิกความงาม</h4>
+            <p class="text-[11px] text-slate-500 mt-1">ยืนยันคิวตรวจผิว, เตือนงดแดด, เลเซอร์</p>
+          </div>
+          <!-- Automotive -->
+          <div onclick="selectIndustryTemplate('automotive')" id="card-tmpl-automotive" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
+            <span class="text-2xl block mb-2">🚗</span>
+            <h4 class="font-bold text-slate-800 text-xs">อู่ & ศูนย์บริการยนต์</h4>
+            <p class="text-[11px] text-slate-500 mt-1">เตือนเช็คระยะ, แจ้งซ่อมเสร็จ, เปลี่ยนถ่ายน้ำมัน</p>
+          </div>
+          <!-- Real Estate -->
+          <div onclick="selectIndustryTemplate('realestate')" id="card-tmpl-realestate" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
+            <span class="text-2xl block mb-2">🏙️</span>
+            <h4 class="font-bold text-slate-800 text-xs">อสังหาริมทรัพย์</h4>
+            <p class="text-[11px] text-slate-500 mt-1">นัดชมห้องตัวอย่าง, โปรพรีเซล, ส่วนลดเงินสด</p>
+          </div>
+          <!-- Dental -->
+          <div onclick="selectIndustryTemplate('dental')" id="card-tmpl-dental" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
+            <span class="text-2xl block mb-2">🦷</span>
+            <h4 class="font-bold text-slate-800 text-xs">คลินิกทันตกรรม</h4>
+            <p class="text-[11px] text-slate-500 mt-1">เตือนนัดขูดหินปูน 6 เดือน, ประกันสังคมทำฟัน</p>
+          </div>
+          <!-- Custom -->
+          <div onclick="selectIndustryTemplate('custom')" id="card-tmpl-custom" class="bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 hover:shadow-md transition card-shadow">
+            <span class="text-2xl block mb-2">⚙️</span>
+            <h4 class="font-bold text-slate-800 text-xs">ธุรกิจกำหนดเอง</h4>
+            <p class="text-[11px] text-slate-500 mt-1">กำหนดบทบาทและสคริปต์ได้อิสระตามความต้องการ</p>
           </div>
         </div>
-        <!-- Card 2 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
-          <div class="flex justify-between items-center">
-            <p class="text-xs text-slate-500 font-medium">ตอบแล้ว</p>
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          </div>
-          <div class="mt-2 flex items-baseline space-x-2">
-            <span id="stat-answered" class="text-3xl font-bold text-slate-900">21</span>
-            <span id="stat-answered-percent" class="text-xs text-emerald-600 font-semibold">95.5%</span>
-          </div>
-        </div>
-        <!-- Card 3 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
-          <div class="flex justify-between items-center">
-            <p class="text-xs text-slate-500 font-medium">รอโทร</p>
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          </div>
-          <div class="mt-2 flex items-baseline space-x-2">
-            <span class="text-3xl font-bold text-slate-900">0</span>
-            <span class="text-xs text-slate-400">0%</span>
-          </div>
-        </div>
-        <!-- Card 4 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
-          <div class="flex justify-between items-center">
-            <p class="text-xs text-slate-500 font-medium">ติดต่อไม่ได้</p>
-            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-          </div>
-          <div class="mt-2 flex items-baseline space-x-2">
-            <span id="stat-unreachable" class="text-3xl font-bold text-slate-900">1</span>
-            <span class="text-xs text-rose-600 font-semibold">4.5%</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- PROGRESS BAR (Green / Red) -->
-      <div class="space-y-1">
-        <div class="w-full h-2.5 bg-rose-400 rounded-full overflow-hidden flex">
-          <div id="bar-green" style="width: 95.5%;" class="h-full bg-emerald-500 transition-all duration-500"></div>
-          <div id="bar-red" style="width: 4.5%;" class="h-full bg-rose-500"></div>
-        </div>
-        <div class="flex items-center space-x-4 text-xs text-slate-500">
-          <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span> ตอบแล้ว 21</span>
-          <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-rose-500 mr-1.5"></span> ติดต่อไม่ได้ 1</span>
-        </div>
-      </div>
-
-      <!-- SECONDARY CARDS (เคสติดตาม / ผลลัพธ์) -->
-      <div class="grid grid-cols-2 gap-4">
-        <!-- Left: เคสที่ต้องติดตาม -->
-        <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow">
-          <h3 class="font-bold text-slate-800 text-sm mb-3">เคสการติดตาม</h3>
-          <div class="grid grid-cols-3 gap-3">
-            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-              <p class="text-xs text-slate-500">เคสที่ต้องติดตาม</p>
-              <p class="text-2xl font-bold text-slate-900 mt-1">6</p>
-              <p class="text-[11px] text-amber-600 mt-1">ค้างเกิน 24 ชม.: 6</p>
+        <!-- Form for Active Core Business -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อธุรกิจ / องค์กร (Business Name)</label>
+              <input type="text" id="biz-name" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
             </div>
-            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-              <p class="text-xs text-slate-500">เคสที่ปิดแล้ว</p>
-              <p class="text-2xl font-bold text-slate-900 mt-1">0</p>
-              <p class="text-[11px] text-slate-400 mt-1">สำเร็จสมบูรณ์</p>
-            </div>
-            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-              <p class="text-xs text-slate-500">เคสที่โทรไม่สำเร็จ</p>
-              <p class="text-2xl font-bold text-rose-600 mt-1">1</p>
-              <p class="text-[11px] text-slate-400 mt-1">ยังไม่เปิดสาย</p>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">หมวดหมู่อุตสาหกรรม (Industry Category)</label>
+              <input type="text" id="biz-industry" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
             </div>
           </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">รายละเอียดและบริการหลักของธุรกิจ (Core Offerings & Description)</label>
+            <textarea id="biz-desc" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อตัวแทน AI (AI Agent Persona Name)</label>
+              <input type="text" id="biz-agent-name" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">ประโยคเริ่มต้นเปิดสาย (Opening Greeting Template)</label>
+              <input type="text" id="biz-opening-text" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+              <span class="text-[10px] text-slate-400">ใช้ {customer_name} แทนชื่อลูกค้า และ {business_name} แทนชื่อธุรกิจ</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">คำแนะนำพิเศษเฉพาะทาง (Custom Domain Instructions & Knowledge)</label>
+            <textarea id="biz-custom-instructions" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"></textarea>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button onclick="saveBusinessProfile()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold text-xs shadow-sm transition">
+              💾 บันทึกการตั้งค่าธุรกิจ
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 3: AI VOICE CONFIGURATION -->
+      <!-- ============================================================== -->
+      <section id="tab-voice" class="space-y-6 hidden">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">เสียงพูด AI (Voice & Personality Tone)</h2>
+          <p class="text-xs text-slate-500">เลือกเพศเสียงภาษาไทย ปรับโทนความเร็ว และทดลองฟังเสียงสังเคราะห์เสมือนคนจริง</p>
         </div>
 
-        <!-- Right: ผลลัพธ์การนัดหมาย (Bar comparison) -->
-        <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow">
-          <h3 class="font-bold text-slate-800 text-sm mb-3">ผลลัพธ์การนัดหมาย</h3>
-          <div class="grid grid-cols-2 gap-6">
-            <!-- Col 1 -->
-            <div class="space-y-2">
-              <div class="flex justify-between text-xs text-slate-600 font-medium">
-                <span>ผลการนัด</span>
-                <span class="text-slate-400">ตอบ 12 จาก 21</span>
+        <div class="grid grid-cols-2 gap-6">
+          <!-- Voice Selector -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow space-y-5">
+            <h3 class="font-bold text-slate-800 text-sm">1. เลือกเพศและโมเดลเสียงภาษาไทย</h3>
+
+            <!-- Gender Cards -->
+            <div class="grid grid-cols-2 gap-4">
+              <div onclick="selectVoiceGender('female')" id="voice-card-female" class="p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer transition">
+                <span class="text-3xl block mb-2">👩‍💼</span>
+                <h4 class="font-bold text-slate-800 text-sm">เสียงผู้หญิง (น้องฟ้า / พรีม)</h4>
+                <p class="text-xs text-slate-500 mt-1">โมเดล Premwadee Neural: เสียงสดใส นุ่มนวล เป็นธรรมชาติสูง เหมาะกับงานบริการและคลินิก</p>
               </div>
-              <div class="space-y-1.5 text-xs">
-                <div class="flex items-center justify-between">
-                  <span class="w-16 text-slate-600">มาตามนัด</span>
-                  <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div id="bar-attended" style="width: 58%;" class="h-full bg-blue-600"></div>
-                  </div>
-                  <span id="num-attended" class="font-bold text-slate-700 w-4 text-right">7</span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="w-16 text-slate-600">ขอเลื่อนนัด</span>
-                  <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div id="bar-rescheduled" style="width: 33%;" class="h-full bg-blue-500"></div>
-                  </div>
-                  <span id="num-rescheduled" class="font-bold text-slate-700 w-4 text-right">4</span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="w-16 text-slate-600">ยกเลิกนัด</span>
-                  <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div id="bar-cancelled" style="width: 10%;" class="h-full bg-blue-400"></div>
-                  </div>
-                  <span id="num-cancelled" class="font-bold text-slate-700 w-4 text-right">1</span>
-                </div>
+
+              <div onclick="selectVoiceGender('male')" id="voice-card-male" class="p-4 rounded-xl border border-slate-200 hover:border-blue-400 cursor-pointer transition">
+                <span class="text-3xl block mb-2">👨‍💼</span>
+                <h4 class="font-bold text-slate-800 text-sm">เสียงผู้ชาย (น้องนนท์)</h4>
+                <p class="text-xs text-slate-500 mt-1">โมเดล Niwat Neural: เสียงสุภาพ น่าเชื่อถือ โทนผู้ใหญ่ เหมาะกับงานยานยนต์และการเงิน</p>
               </div>
             </div>
 
-            <!-- Col 2 -->
-            <div class="space-y-2">
-              <div class="flex justify-between text-xs text-slate-600 font-medium">
-                <span>ได้วันเวลานัดใหม่</span>
-                <span class="text-slate-400">ตอบ 5 จาก 21</span>
+            <!-- Tone & Speed -->
+            <div class="space-y-4 pt-2">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">โทนเสียงสนทนา (Conversation Tone)</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" onclick="setTone('Friendly')" id="tone-Friendly" class="py-2 px-3 text-xs rounded-lg border font-semibold border-blue-600 bg-blue-50 text-blue-600">
+                    😊 อบอุ่น เป็นกันเอง
+                  </button>
+                  <button type="button" onclick="setTone('Formal')" id="tone-Formal" class="py-2 px-3 text-xs rounded-lg border font-semibold border-slate-300 text-slate-600 hover:bg-slate-50">
+                    👔 สุภาพ ทางการ
+                  </button>
+                  <button type="button" onclick="setTone('Energetic')" id="tone-Energetic" class="py-2 px-3 text-xs rounded-lg border font-semibold border-slate-300 text-slate-600 hover:bg-slate-50">
+                    ⚡ สดใส กระตือรือร้น
+                  </button>
+                </div>
               </div>
-              <div class="space-y-1.5 text-xs">
-                <div class="flex items-center justify-between">
-                  <span class="w-16 text-slate-600">ใช่</span>
-                  <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div style="width: 60%;" class="h-full bg-indigo-600"></div>
-                  </div>
-                  <span class="font-bold text-slate-700 w-4 text-right">3</span>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="text-xs font-semibold text-slate-700">ความเร็วในการพูด (Speech Rate)</label>
+                  <span id="speed-label" class="text-xs font-bold text-blue-600">1.0x (ปกติ)</span>
                 </div>
-                <div class="flex items-center justify-between">
-                  <span class="w-16 text-slate-600">ไม่ใช่</span>
-                  <div class="flex-1 mx-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div style="width: 40%;" class="h-full bg-indigo-400"></div>
-                  </div>
-                  <span class="font-bold text-slate-700 w-4 text-right">2</span>
-                </div>
+                <input type="range" id="voice-speed" min="0.8" max="1.2" step="0.1" value="1.0" oninput="onSpeedSlider(this.value)" class="w-full accent-blue-600 cursor-pointer">
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- CALL HISTORY TABLE (Exact match to Screenshot 2) -->
-      <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-          <h3 class="font-bold text-slate-800 text-base">ผลการโทรล่าสุด (Call Out History)</h3>
-          <span class="text-xs text-slate-500">บันทึกเสียงและถอดเทปสนทนาเรียลไทม์</span>
+          <!-- Preview & Test Box -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between">
+            <div class="space-y-4">
+              <h3 class="font-bold text-slate-800 text-sm">2. ทดลองฟังเสียงสังเคราะห์ (Live Voice Preview)</h3>
+              <p class="text-xs text-slate-500">ระบบจะสร้างไฟล์เสียงสังเคราะห์ภาษาไทยตามเพศ โทนเสียง และชื่อธุรกิจที่คุณเลือกไว้ทันที</p>
+              
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
+                <span class="text-slate-400 font-semibold block text-[10px]">ตัวอย่างข้อความทดสอบ:</span>
+                <p id="preview-sample-text" class="text-slate-700 leading-relaxed italic">
+                  "สวัสดีค่ะ ขอเรียนสายคุณลูกค้า จากเดอร์มา แคร์ คลินิก วันนี้น้องฟ้า โทรมาเพื่อให้บริการและอำนวยความสะดวกค่ะ"
+                </p>
+              </div>
+
+              <div id="preview-audio-container" class="hidden">
+                <audio id="preview-audio-player" controls class="w-full h-9 rounded"></audio>
+              </div>
+            </div>
+
+            <div class="pt-6">
+              <button onclick="triggerVoicePreview()" id="btn-preview-voice" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm transition">
+                <span>▶️</span>
+                <span>กดฟังเสียงตัวอย่าง AI ทันที</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50/80 text-xs text-slate-500 font-semibold border-b border-slate-200">
-                <th class="py-3 px-4">ชื่อ / เบอร์</th>
-                <th class="py-3 px-4">Job / Ref</th>
-                <th class="py-3 px-4">สถานะ / เวลาคุย</th>
-                <th class="py-3 px-4">ผลการนัด</th>
-                <th class="py-3 px-4">ได้วันเวลานัดใหม่</th>
-                <th class="py-3 px-4 w-1/3">สรุปตามสาย (AI Summary)</th>
-                <th class="py-3 px-4 text-center">ฟัง / โทร</th>
-              </tr>
-            </thead>
-            <tbody id="table-calls" class="divide-y divide-slate-100 text-xs">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 4: CUSTOMER QUEUE & SCHEDULER -->
+      <!-- ============================================================== -->
+      <section id="tab-queue" class="space-y-6 hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">คิวโทรและตั้งเวลาโทรออก (Outbound Queue)</h2>
+            <p class="text-xs text-slate-500">นำเข้ารายชื่อลูกค้า กำหนดวันเวลาโทรออกล่วงหน้า หรือสั่งโทรทันที</p>
+          </div>
+          <button onclick="openAddCustomerModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition">
+            <span>+</span> <span>เพิ่มรายชื่อลูกค้า</span>
+          </button>
         </div>
-      </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50/80 text-xs text-slate-500 font-semibold border-b border-slate-200">
+                  <th class="py-3 px-4">ชื่อลูกค้า</th>
+                  <th class="py-3 px-4">เบอร์โทรศัพท์</th>
+                  <th class="py-3 px-4">รายละเอียด / วัตถุประสงค์</th>
+                  <th class="py-3 px-4">กำหนดเวลาโทรออก</th>
+                  <th class="py-3 px-4">สถานะคิว</th>
+                  <th class="py-3 px-4 text-center">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="table-queue" class="divide-y divide-slate-100 text-xs">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 5: PROMPTPAY WALLET & CREDIT TOP-UP -->
+      <!-- ============================================================== -->
+      <section id="tab-wallet" class="space-y-6 hidden">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">กระเป๋าเครดิต & เติมเงินผ่านพร้อมเพย์ (PromptPay Wallet)</h2>
+          <p class="text-xs text-slate-500">เติมเครดิตการโทรอัตโนมัติด้วย QR Code พร้อมเพย์มาตรฐาน EMVCo สแกนจ่ายผ่าน Mobile Banking ได้ทุกธนาคาร</p>
+        </div>
+
+        <!-- Current Balance Banner -->
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center">
+          <div>
+            <span class="text-blue-200 text-xs font-medium">ยอดเครดิตคงเหลือของคุณ</span>
+            <div class="flex items-baseline space-x-3 mt-1">
+              <span id="wallet-balance" class="text-4xl font-extrabold">1,878</span>
+              <span class="text-blue-200 text-sm">เครดิต (โทรได้ประมาณ 1,878 ครั้ง)</span>
+            </div>
+            <p class="text-xs text-blue-200/80 mt-2">อัตราค่าบริการ: 1 เครดิต ต่อ 1 สายการโทรที่จบการสนทนา</p>
+          </div>
+          <div class="text-right">
+            <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-xs">
+              ⚡ พร้อมเพย์รับเงินทันที
+            </span>
+          </div>
+        </div>
+
+        <!-- Package Grid -->
+        <div class="grid grid-cols-4 gap-4">
+          <!-- 100 -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between hover:border-blue-500 transition">
+            <div>
+              <span class="text-xs font-semibold text-slate-500">แพ็กเกจทดลอง</span>
+              <h3 class="text-2xl font-bold text-slate-900 mt-1">100 บาท</h3>
+              <p class="text-sm font-bold text-blue-600 mt-2">100 เครดิต</p>
+              <p class="text-[11px] text-slate-400 mt-1">1 บาท = 1 เครดิต</p>
+            </div>
+            <button onclick="openPromptPayModal(100, 100, 'pkg_100')" class="w-full mt-4 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 font-semibold py-2 rounded-lg text-xs transition">
+              เลือกแพ็กเกจนี้
+            </button>
+          </div>
+
+          <!-- 300 Popular -->
+          <div class="bg-white p-5 rounded-xl border-2 border-blue-600 card-shadow flex flex-col justify-between relative shadow-md">
+            <span class="absolute -top-2.5 right-4 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+              ยอดนิยม
+            </span>
+            <div>
+              <span class="text-xs font-semibold text-slate-500">แพ็กเกจสุดคุ้ม</span>
+              <h3 class="text-2xl font-bold text-slate-900 mt-1">300 บาท</h3>
+              <p class="text-sm font-bold text-blue-600 mt-2">330 เครดิต</p>
+              <p class="text-[11px] text-emerald-600 font-semibold mt-1">+10% โบนัสพิเศษ (แถม 30 แต้ม)</p>
+            </div>
+            <button onclick="openPromptPayModal(300, 330, 'pkg_300')" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg text-xs shadow-xs transition">
+              สแกนพร้อมเพย์ 300.-
+            </button>
+          </div>
+
+          <!-- 500 -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between hover:border-blue-500 transition">
+            <div>
+              <span class="text-xs font-semibold text-slate-500">แพ็กเกจธุรกิจ</span>
+              <h3 class="text-2xl font-bold text-slate-900 mt-1">500 บาท</h3>
+              <p class="text-sm font-bold text-blue-600 mt-2">600 เครดิต</p>
+              <p class="text-[11px] text-emerald-600 font-semibold mt-1">+20% โบนัสพิเศษ (แถม 100 แต้ม)</p>
+            </div>
+            <button onclick="openPromptPayModal(500, 600, 'pkg_500')" class="w-full mt-4 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 font-semibold py-2 rounded-lg text-xs transition">
+              เลือกแพ็กเกจนี้
+            </button>
+          </div>
+
+          <!-- 1000 -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between hover:border-blue-500 transition">
+            <div>
+              <span class="text-xs font-semibold text-slate-500">แพ็กเกจองค์กร</span>
+              <h3 class="text-2xl font-bold text-slate-900 mt-1">1,000 บาท</h3>
+              <p class="text-sm font-bold text-blue-600 mt-2">1,300 เครดิต</p>
+              <p class="text-[11px] text-emerald-600 font-semibold mt-1">+30% โบนัสสูงสุด (แถม 300 แต้ม)</p>
+            </div>
+            <button onclick="openPromptPayModal(1000, 1300, 'pkg_1000')" class="w-full mt-4 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 font-semibold py-2 rounded-lg text-xs transition">
+              เลือกแพ็กเกจนี้
+            </button>
+          </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-200">
+            <h3 class="font-bold text-slate-800 text-sm">ประวัติการทำรายการเติมเครดิต (Payment History)</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-200">
+                  <th class="py-3 px-4">วันที่ / เวลา</th>
+                  <th class="py-3 px-4">เลขอ้างอิง PromptPay</th>
+                  <th class="py-3 px-4">ยอดเงิน (บาท)</th>
+                  <th class="py-3 px-4">เครดิตที่ได้รับ</th>
+                  <th class="py-3 px-4">สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="table-transactions" class="divide-y divide-slate-100">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 6: RBAC & USER MANAGEMENT -->
+      <!-- ============================================================== -->
+      <section id="tab-users" class="space-y-6 hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">จัดการผู้ใช้งานและสิทธิ์ (RBAC: Role-Based Access Control)</h2>
+            <p class="text-xs text-slate-500">ระบบจำแนกผู้ใช้ 3 ระดับ: Super Admin (ผู้ดูแลระบบ), Business Owner (เจ้าของธุรกิจ), และ Staff (พนักงาน/ลูกค้า)</p>
+          </div>
+          <button onclick="openAddUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
+            + เพิ่มผู้ใช้งานใหม่
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-200">
+                  <th class="py-3 px-4">ชื่อ - นามสกุล</th>
+                  <th class="py-3 px-4">Username / Email</th>
+                  <th class="py-3 px-4">ระดับสิทธิ์ (Role)</th>
+                  <th class="py-3 px-4">เครดิตบัญชี</th>
+                  <th class="py-3 px-4">วันที่สร้าง</th>
+                  <th class="py-3 px-4 text-center">สลับเป็นผู้ใช้นี้</th>
+                </tr>
+              </thead>
+              <tbody id="table-users" class="divide-y divide-slate-100">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
     </div>
   </main>
 
-  <!-- LIVE CALL SIMULATION MODAL -->
+  <!-- ============================================================== -->
+  <!-- MODAL: PROMPTPAY QR PAYMENT -->
+  <!-- ============================================================== -->
+  <div id="modal-promptpay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col text-center">
+      <div class="bg-blue-900 text-white p-4 relative">
+        <button onclick="closePromptPayModal()" class="absolute top-3 right-3 text-white/70 hover:text-white text-lg">✕</button>
+        <div class="w-10 h-10 mx-auto rounded-full bg-white/10 flex items-center justify-center text-xl mb-1">
+          💳
+        </div>
+        <h3 class="font-bold text-base">สแกนชำระผ่าน PromptPay</h3>
+        <p class="text-xs text-blue-200">Mobile Banking ทุกธนาคาร</p>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div>
+          <span class="text-xs text-slate-400">ยอดชำระ</span>
+          <p id="pp-modal-amount" class="text-3xl font-extrabold text-slate-900">300.00 บาท</p>
+          <span id="pp-modal-credits" class="inline-block mt-1 bg-emerald-50 text-emerald-700 font-bold text-xs px-2.5 py-0.5 rounded-full border border-emerald-200">
+            ได้รับ 330 เครดิต
+          </span>
+        </div>
+
+        <!-- QR Code Container -->
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 inline-block shadow-inner">
+          <img id="pp-qr-image" src="" alt="PromptPay QR Code" class="w-48 h-48 mx-auto rounded-lg">
+        </div>
+
+        <div class="text-[11px] text-slate-400 space-y-0.5">
+          <p>เลขพร้อมเพย์: <span class="font-semibold text-slate-700">081-234-5678</span></p>
+          <p>เลขอ้างอิง: <span id="pp-modal-ref" class="font-semibold text-slate-700">PP-20261110-001</span></p>
+        </div>
+
+        <!-- Simulation Payment Button -->
+        <button onclick="confirmPromptPaySimulation()" id="btn-confirm-pp" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-md transition flex items-center justify-center space-x-1.5">
+          <span>✅</span>
+          <span>จำลองการชำระเงินสำเร็จ (Instant Top-up)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: ADD CUSTOMER TO QUEUE -->
+  <!-- ============================================================== -->
+  <div id="modal-add-customer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-800 text-base">เพิ่มรายชื่อและตั้งเวลาโทรออก</h3>
+        <button onclick="closeAddCustomerModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อลูกค้า</label>
+          <input type="text" id="add-cust-name" placeholder="เช่น คุณวิภา สุวรรณ" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์</label>
+          <input type="text" id="add-cust-phone" placeholder="เช่น 089-123-4567" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">รายละเอียด / วัตถุประสงค์การโทร</label>
+          <input type="text" id="add-cust-detail" placeholder="เช่น ยืนยันนัดตรวจผิว วันพรุ่งนี้ 14:00 น." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">กำหนดเวลาโทรออก (Scheduled Time)</label>
+          <input type="text" id="add-cust-time" placeholder="เช่น วันนี้ 15:30 น. หรือ ทันที" value="วันนี้ 16:30 น." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none">
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end space-x-2">
+        <button onclick="closeAddCustomerModal()" class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50">
+          ยกเลิก
+        </button>
+        <button onclick="submitAddCustomer()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700">
+          บันทึกเข้าคิว
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: ADD USER (RBAC) -->
+  <!-- ============================================================== -->
+  <div id="modal-add-user" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-800 text-base">เพิ่มผู้ใช้งานใหม่ (Add User)</h3>
+        <button onclick="closeAddUserModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อผู้ใช้งาน (Username)</label>
+          <input type="text" id="add-usr-username" placeholder="เช่น staff_clinic" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อ - นามสกุล</label>
+          <input type="text" id="add-usr-name" placeholder="เช่น นางสาวมุกดา ใจดี" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">อีเมล</label>
+          <input type="email" id="add-usr-email" placeholder="staff@clinic.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ระดับสิทธิ์ (Role)</label>
+          <select id="add-usr-role" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none">
+            <option value="staff">👤 Staff / Client (พนักงาน/ลูกค้า)</option>
+            <option value="owner">🏢 Business Owner (เจ้าของธุรกิจ)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end space-x-2">
+        <button onclick="closeAddUserModal()" class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg text-xs font-semibold">
+          ยกเลิก
+        </button>
+        <button onclick="submitAddUser()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold">
+          สร้างผู้ใช้
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: LIVE CALL SIMULATION (ADAPTIVE PERSONA) -->
+  <!-- ============================================================== -->
   <div id="call-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
       
-      <!-- Modal Header (Calling Screen) -->
+      <!-- Call Screen Header -->
       <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 text-center relative">
         <button onclick="closeCallModal()" class="absolute top-4 right-4 text-white/70 hover:text-white text-lg font-bold">✕</button>
         <div class="relative w-20 h-20 mx-auto mb-3">
           <div id="call-pulse" class="absolute inset-0 rounded-full bg-blue-400 opacity-50 pulse-ring hidden"></div>
-          <div class="w-20 h-20 rounded-full bg-white/20 border-2 border-white/60 flex items-center justify-center text-3xl font-bold shadow-lg">
+          <div id="call-avatar" class="w-20 h-20 rounded-full bg-white/20 border-2 border-white/60 flex items-center justify-center text-3xl font-bold shadow-lg">
             👩‍💼
           </div>
         </div>
-        <h3 id="modal-customer-name" class="font-bold text-lg">น้องฟ้า (AI Voice) กำลังโทรหา คุณจ๋า</h3>
-        <p id="modal-customer-phone" class="text-xs text-blue-200">093-340-9929 • สายตรงคลินิก</p>
+        <h3 id="modal-customer-name" class="font-bold text-lg">AI กำลังโทรหา คุณลูกค้า</h3>
+        <p id="modal-customer-phone" class="text-xs text-blue-200">093-340-9929 • สายตรงศูนย์บริการ</p>
         <div id="modal-call-status" class="mt-2 inline-block bg-blue-900/60 text-blue-200 text-xs px-3 py-1 rounded-full font-medium">
           กำลังเตรียมสัญญาณ...
         </div>
       </div>
 
-      <!-- Dialogue History Window -->
+      <!-- Dialogue History -->
       <div id="transcript-box" class="p-4 space-y-3 h-64 overflow-y-auto bg-slate-50 text-xs">
         <!-- Dialogue bubbles injected here -->
       </div>
 
-      <!-- Quick Preset Replies (Convenient for quick testing) -->
+      <!-- Quick Preset Replies -->
       <div class="p-3 bg-slate-100 border-t border-slate-200 space-y-1.5">
-        <p class="text-[11px] text-slate-500 font-semibold">หรือคลิกประโยคตัวอย่างเพื่อตอบแทนการพูด:</p>
+        <p class="text-[11px] text-slate-500 font-semibold">คลิกคำตอบตัวอย่าง หรือกดไมค์เพื่อพูด:</p>
         <div class="flex flex-wrap gap-1.5">
-          <button onclick="sendPresetText('ใช่ค่ะ คุณจ๋าพูดอยู่ สะดวกคุยค่ะ')" class="bg-white border border-slate-300 hover:bg-blue-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
-            1. ยืนยันตัวตน (ใช่ค่ะ คุณจ๋า)
+          <button onclick="sendPresetText('ใช่ค่ะ กำลังพูดสายอยู่ สะดวกคุยค่ะ')" class="bg-white border border-slate-300 hover:bg-blue-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
+            1. ยืนยันตัวตน (ใช่ค่ะ สะดวกคุย)
           </button>
-          <button onclick="sendPresetText('สะดวกไปตามนัดเดิม วันพรุ่งนี้บ่ายสองค่ะ')" class="bg-white border border-slate-300 hover:bg-emerald-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
+          <button onclick="sendPresetText('สะดวกไปตามนัดหมายเดิมแน่นอนค่ะ ขอบคุณค่ะ')" class="bg-white border border-slate-300 hover:bg-emerald-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
             2. สะดวกมาตามนัด
           </button>
-          <button onclick="sendPresetText('พรุ่งนี้ไม่ว่างเลย ขอเลื่อนเป็นวันศุกร์บ่ายสองได้ไหมคะ')" class="bg-white border border-slate-300 hover:bg-amber-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
-            3. ขอเลื่อนนัด (วันศุกร์บ่ายสอง)
+          <button onclick="sendPresetText('ติดธุระด่วนเลยค่ะ ขอเลื่อนเป็นวันศุกร์บ่ายสองได้ไหมคะ')" class="bg-white border border-slate-300 hover:bg-amber-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
+            3. ขอเลื่อนนัด
           </button>
-          <button onclick="sendPresetText('ขอโทษครับ โทรผิดเบอร์แล้วครับ ผมเป็นผู้ชาย ไม่ใช่คุณจ๋า')" class="bg-white border border-slate-300 hover:bg-rose-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
-            4. โทรผิดเบอร์ (ไม่ใช่เจ้าของ)
+          <button onclick="sendPresetText('ขอโทษครับ โทรผิดเบอร์แล้วครับ ผมเป็นผู้ชาย')" class="bg-white border border-slate-300 hover:bg-rose-50 text-slate-700 px-2 py-1 rounded text-[11px] transition">
+            4. โทรผิดเบอร์
           </button>
         </div>
       </div>
@@ -340,7 +836,7 @@
         <button id="btn-mic" onclick="toggleMic()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-lg border border-slate-300 shrink-0 transition" title="คลิกเพื่อเปิดไมค์พูด">
           🎙️
         </button>
-        <input id="input-speech" type="text" placeholder="พิมพ์ข้อความตอบกลับ หรือคลิกไมค์เพื่อพูด..." onkeydown="if(event.key==='Enter') sendInputSpeech()" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+        <input id="input-speech" type="text" placeholder="พิมพ์ข้อความตอบกลับ หรือคลิกไมค์..." onkeydown="if(event.key==='Enter') sendInputSpeech()" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
         <button onclick="sendInputSpeech()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shrink-0">
           ตอบ
         </button>
@@ -355,30 +851,82 @@
   <!-- Audio Player Hidden -->
   <audio id="audio-player" class="hidden"></audio>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- ============================================================== -->
+  <!-- JAVASCRIPT APPLICATION CONTROLLER -->
+  <!-- ============================================================== -->
   <script>
+    let activeTab = 'dashboard';
     let currentSessionId = null;
     let isMicRecording = false;
     let speechRecognizer = null;
+    let currentBusiness = {};
+    let currentUser = {};
+    let pendingTopup = null;
 
-    // Load initial dashboard data
+    // Tab Switching
+    function switchTab(tabId) {
+      activeTab = tabId;
+      const tabs = ['dashboard', 'business', 'voice', 'queue', 'wallet', 'users'];
+      tabs.forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (el) el.classList.toggle('hidden', t !== tabId);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = 'w-full flex items-center px-3 py-2.5 bg-blue-600/20 text-blue-400 font-semibold rounded-lg border-l-4 border-blue-500 transition';
+          } else {
+            btn.className = 'w-full flex items-center px-3 py-2.5 text-slate-300 hover:bg-slate-800/60 rounded-lg transition';
+          }
+        }
+      });
+
+      const titleMap = {
+        dashboard: ['Campaign Report', 'รายงานสถิติการโทรออกและการติดตามผลรายวัน'],
+        business: ['Core Business Setup', 'กำหนดธุรกิจ บริการหลัก และความรู้เฉพาะทางของ AI'],
+        voice: ['AI Voice & Personality', 'ปรับแต่งเสียงพูดภาษาไทย โทนเสียง และความเร็ว'],
+        queue: ['Outbound Queue & Scheduler', 'จัดการคิวรายชื่อและกำหนดเวลาโทรออก'],
+        wallet: ['PromptPay Wallet', 'กระเป๋าเครดิตและเติมเงินผ่านระบบพร้อมเพย์'],
+        users: ['User Management (RBAC)', 'จัดการผู้ใช้และระดับสิทธิ์การเข้าถึง']
+      };
+      if (titleMap[tabId]) {
+        document.getElementById('header-title').innerText = titleMap[tabId][0];
+        document.getElementById('header-subtitle').innerText = titleMap[tabId][1];
+      }
+
+      if (tabId === 'business') loadBusinessProfiles();
+      if (tabId === 'queue') loadCustomerQueue();
+      if (tabId === 'wallet') loadWalletData();
+      if (tabId === 'users') loadUsersData();
+    }
+
+    // Load initial data
     async function loadDashboard() {
       try {
         const res = await fetch('/api/dashboard_data');
         const data = await res.json();
-        
-        // Update stats
+        currentBusiness = data.active_business || {};
+        currentUser = data.current_user || {};
+
+        // Update brand in sidebar
+        document.getElementById('nav-active-business-name').innerText = currentBusiness.name || 'AI Voice';
+        document.getElementById('sidebar-credits').innerText = `${currentUser.credits?.toLocaleString() || 0} แต้ม`;
+        document.getElementById('top-credits-count').innerText = currentUser.credits?.toLocaleString() || 0;
+        document.getElementById('sidebar-user-name').innerText = currentUser.name || 'User';
+        document.getElementById('sidebar-user-role').innerText = currentUser.role_badge || 'User';
+        document.getElementById('select-role-switch').value = currentUser.role || 'owner';
+
+        // Stats
         document.getElementById('stat-total').innerText = data.stats.total;
         document.getElementById('stat-answered').innerText = data.stats.answered;
         document.getElementById('stat-answered-percent').innerText = data.stats.answered_percent;
+        document.getElementById('stat-pending').innerText = data.stats.pending;
         document.getElementById('stat-unreachable').innerText = data.stats.unreachable;
 
-        // Update outcomes
         document.getElementById('num-attended').innerText = data.outcomes.attended;
         document.getElementById('num-rescheduled').innerText = data.outcomes.rescheduled;
         document.getElementById('num-cancelled').innerText = data.outcomes.cancelled;
 
-        // Render Table
+        // Calls table
         const tbody = document.getElementById('table-calls');
         tbody.innerHTML = '';
         data.calls.forEach(call => {
@@ -387,14 +935,13 @@
             outcomeBadge = '<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded border border-emerald-200">มาตามนัด</span>';
           } else if (call.appointment_outcome === 'ขอเลื่อนนัด') {
             outcomeBadge = '<span class="bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded border border-blue-200">ขอเลื่อนนัด</span>';
-          } else if (call.appointment_outcome === 'ยกเลิกนัด' || call.appointment_outcome.includes('ผิดเบอร์')) {
-            outcomeBadge = '<span class="bg-rose-50 text-rose-700 font-semibold px-2 py-0.5 rounded border border-rose-200">ยกเลิก / ไม่ใช่</span>';
+          } else if (call.appointment_outcome === 'ยกเลิกนัด' || (call.appointment_outcome && call.appointment_outcome.includes('ผิดเบอร์'))) {
+            outcomeBadge = '<span class="bg-rose-50 text-rose-700 font-semibold px-2 py-0.5 rounded border border-rose-200">ยกเลิก / ผิดเบอร์</span>';
           }
 
           const statusColor = call.status.includes('สำเร็จ') ? 'text-emerald-600 font-medium' : 'text-rose-600 font-medium';
-
           const audioBtn = call.audio_file 
-            ? `<button onclick="playSavedAudio('${call.audio_file}')" class="text-blue-600 hover:text-blue-800 font-medium">🎧 ฟังเสียง</button>`
+            ? `<button onclick="playVoiceAudio('${call.audio_file}')" class="text-blue-600 hover:text-blue-800 font-medium">🎧 ฟังเสียง</button>`
             : `<span class="text-slate-400">🎧 ฟัง</span>`;
 
           const row = `
@@ -414,22 +961,411 @@
               <td class="py-3 px-4 text-center">
                 <div class="flex items-center justify-center space-x-2">
                   ${audioBtn}
-                  <button onclick="triggerSimForCustomer('${call.name}', '${call.phone}')" class="text-slate-400 hover:text-slate-700" title="โทรซ้ำ">🔄</button>
+                  <button onclick="openCallModal('${call.name}', '${call.phone}')" class="text-slate-400 hover:text-blue-600" title="โทรออก">📞</button>
                 </div>
               </td>
             </tr>
           `;
           tbody.innerHTML += row;
         });
+
       } catch (err) {
         console.error('Error loading dashboard:', err);
       }
     }
 
-    // Modal Controls
-    function openCallModal(name = "คุณจ๋า", phone = "093-340-9929") {
-      document.getElementById('modal-customer-name').innerText = `น้องฟ้า (AI Voice) กำลังโทรหา ${name}`;
-      document.getElementById('modal-customer-phone').innerText = `${phone} • สายตรงคลินิก`;
+    // Role Switcher
+    async function onRoleChanged(role) {
+      try {
+        const res = await fetch('/api/switch_user', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({role: role})
+        });
+        const data = await res.json();
+        currentUser = data.current_user;
+        loadDashboard();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Core Business Settings
+    async function loadBusinessProfiles() {
+      try {
+        const res = await fetch('/api/business_profiles');
+        const data = await res.json();
+        currentBusiness = data.active_profile;
+        populateBusinessForm(currentBusiness);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function populateBusinessForm(biz) {
+      document.getElementById('biz-name').value = biz.name || '';
+      document.getElementById('biz-industry').value = biz.industry || '';
+      document.getElementById('biz-desc').value = biz.description || '';
+      document.getElementById('biz-agent-name').value = biz.agent_name || '';
+      document.getElementById('biz-opening-text').value = biz.opening_text || '';
+      document.getElementById('biz-custom-instructions').value = biz.custom_instructions || '';
+      
+      // Update template card highlight
+      ['clinic', 'automotive', 'realestate', 'dental', 'custom'].forEach(t => {
+        const card = document.getElementById(`card-tmpl-${t}`);
+        if (card) {
+          if (biz.id === t) {
+            card.className = 'bg-white p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer shadow-sm transition';
+          } else {
+            card.className = 'bg-white p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 transition';
+          }
+        }
+      });
+    }
+
+    async function selectIndustryTemplate(templateId) {
+      try {
+        const res = await fetch('/api/business_profiles/select', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({template_id: templateId})
+        });
+        const data = await res.json();
+        currentBusiness = data.active_profile;
+        populateBusinessForm(currentBusiness);
+        loadDashboard();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function saveBusinessProfile() {
+      const payload = {
+        name: document.getElementById('biz-name').value,
+        industry: document.getElementById('biz-industry').value,
+        description: document.getElementById('biz-desc').value,
+        agent_name: document.getElementById('biz-agent-name').value,
+        opening_text: document.getElementById('biz-opening-text').value,
+        custom_instructions: document.getElementById('biz-custom-instructions').value
+      };
+      try {
+        const res = await fetch('/api/business_profiles/update', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        currentBusiness = data.active_profile;
+        alert('บันทึกการตั้งค่าธุรกิจเรียบร้อยแล้ว!');
+        loadDashboard();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Voice Config & Preview
+    function selectVoiceGender(gender) {
+      const isFemale = gender === 'female';
+      currentBusiness.agent_gender = gender;
+      currentBusiness.voice_id = isFemale ? 'th-TH-PremwadeeNeural' : 'th-TH-NiwatNeural';
+      
+      document.getElementById('voice-card-female').className = isFemale 
+        ? 'p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer transition'
+        : 'p-4 rounded-xl border border-slate-200 hover:border-blue-400 cursor-pointer transition';
+
+      document.getElementById('voice-card-male').className = !isFemale 
+        ? 'p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer transition'
+        : 'p-4 rounded-xl border border-slate-200 hover:border-blue-400 cursor-pointer transition';
+    }
+
+    function setTone(tone) {
+      currentBusiness.tone = tone;
+      ['Friendly', 'Formal', 'Energetic'].forEach(t => {
+        const btn = document.getElementById(`tone-${t}`);
+        if (btn) {
+          if (t === tone) {
+            btn.className = 'py-2 px-3 text-xs rounded-lg border font-semibold border-blue-600 bg-blue-50 text-blue-600';
+          } else {
+            btn.className = 'py-2 px-3 text-xs rounded-lg border font-semibold border-slate-300 text-slate-600 hover:bg-slate-50';
+          }
+        }
+      });
+    }
+
+    function onSpeedSlider(val) {
+      currentBusiness.speed = parseFloat(val);
+      document.getElementById('speed-label').innerText = `${val}x (${val == 1.0 ? 'ปกติ' : val < 1.0 ? 'ช้า' : 'เร็ว'})`;
+    }
+
+    async function triggerVoicePreview() {
+      const btn = document.getElementById('btn-preview-voice');
+      btn.innerText = '⏳ กำลังสังเคราะห์เสียงตัวอย่าง...';
+      try {
+        const res = await fetch('/api/preview_voice', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            voice_id: currentBusiness.voice_id,
+            speed: currentBusiness.speed || 1.0,
+            agent_name: currentBusiness.agent_name,
+            name: currentBusiness.name
+          })
+        });
+        const data = await res.json();
+        btn.innerText = '▶️ กดฟังเสียงตัวอย่าง AI ทันที';
+        if (data.audio_url) {
+          const container = document.getElementById('preview-audio-container');
+          container.classList.remove('hidden');
+          const player = document.getElementById('preview-audio-player');
+          player.src = data.audio_url;
+          player.play();
+        }
+      } catch (e) {
+        console.error(e);
+        btn.innerText = '▶️ กดฟังเสียงตัวอย่าง AI ทันที';
+      }
+    }
+
+    // Customer Queue
+    async function loadCustomerQueue() {
+      try {
+        const res = await fetch('/api/customers');
+        const data = await res.json();
+        const tbody = document.getElementById('table-queue');
+        tbody.innerHTML = '';
+        document.getElementById('badge-queue-count').innerText = data.queue.length;
+
+        data.queue.forEach(item => {
+          const row = `
+            <tr class="hover:bg-slate-50/60 transition">
+              <td class="py-3 px-4 font-semibold text-slate-800">${item.name}</td>
+              <td class="py-3 px-4 text-slate-600 font-mono text-[11px]">${item.phone}</td>
+              <td class="py-3 px-4 text-slate-600">${item.detail}</td>
+              <td class="py-3 px-4 text-blue-600 font-medium">${item.scheduled_time}</td>
+              <td class="py-3 px-4">
+                <span class="bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded border border-amber-200">
+                  ${item.status}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-center">
+                <div class="flex items-center justify-center space-x-2">
+                  <button onclick="openCallModal('${item.name}', '${item.phone}', '${item.detail}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-[11px] font-semibold">
+                    📞 โทรทันที
+                  </button>
+                  <button onclick="deleteCustomerQueue('${item.id}')" class="text-slate-400 hover:text-rose-600 text-sm">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function openAddCustomerModal() {
+      document.getElementById('modal-add-customer').classList.remove('hidden');
+    }
+    function closeAddCustomerModal() {
+      document.getElementById('modal-add-customer').classList.add('hidden');
+    }
+
+    async function submitAddCustomer() {
+      const payload = {
+        name: document.getElementById('add-cust-name').value,
+        phone: document.getElementById('add-cust-phone').value,
+        detail: document.getElementById('add-cust-detail').value,
+        scheduled_time: document.getElementById('add-cust-time').value
+      };
+      if (!payload.name || !payload.phone) return alert('กรุณากรอกชื่อและเบอร์โทร');
+      try {
+        await fetch('/api/customers', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        closeAddCustomerModal();
+        loadCustomerQueue();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function deleteCustomerQueue(id) {
+      if (!confirm('ยืนยันการลบคิวนี้?')) return;
+      try {
+        await fetch(`/api/customers/${id}`, {method: 'DELETE'});
+        loadCustomerQueue();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // PromptPay Wallet
+    async function loadWalletData() {
+      try {
+        const res = await fetch('/api/credits');
+        const data = await res.json();
+        document.getElementById('wallet-balance').innerText = data.credits.toLocaleString();
+        
+        const tbody = document.getElementById('table-transactions');
+        tbody.innerHTML = '';
+        data.transactions.forEach(txn => {
+          const row = `
+            <tr class="hover:bg-slate-50/60 transition">
+              <td class="py-3 px-4 font-medium text-slate-700">${txn.timestamp}</td>
+              <td class="py-3 px-4 text-slate-500 font-mono">${txn.promptpay_ref}</td>
+              <td class="py-3 px-4 font-bold text-slate-900">${txn.amount.toLocaleString()} ฿</td>
+              <td class="py-3 px-4 font-bold text-emerald-600">+${txn.credits_added.toLocaleString()} แต้ม</td>
+              <td class="py-3 px-4">
+                <span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-semibold text-[11px] border border-emerald-200">
+                  ${txn.status}
+                </span>
+              </td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function openPromptPayModal(amount, credits, packageId) {
+      pendingTopup = { amount, credits, packageId };
+      try {
+        const res = await fetch('/api/topup/promptpay_qr', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ amount: amount, package_id: packageId })
+        });
+        const data = await res.json();
+        document.getElementById('pp-modal-amount').innerText = `${amount.toFixed(2)} บาท`;
+        document.getElementById('pp-modal-credits').innerText = `ได้รับ ${credits.toLocaleString()} เครดิต`;
+        document.getElementById('pp-qr-image').src = data.qr_image_url;
+        document.getElementById('pp-modal-ref').innerText = data.reference_id;
+        pendingTopup.reference_id = data.reference_id;
+
+        document.getElementById('modal-promptpay').classList.remove('hidden');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function closePromptPayModal() {
+      document.getElementById('modal-promptpay').classList.add('hidden');
+    }
+
+    async function confirmPromptPaySimulation() {
+      if (!pendingTopup) return;
+      const btn = document.getElementById('btn-confirm-pp');
+      btn.innerText = '⏳ กำลังยืนยันยอดเงิน...';
+      try {
+        const res = await fetch('/api/topup/confirm', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            amount: pendingTopup.amount,
+            credits_to_add: pendingTopup.credits,
+            reference_id: pendingTopup.reference_id
+          })
+        });
+        const data = await res.json();
+        alert(data.message);
+        closePromptPayModal();
+        loadDashboard();
+        loadWalletData();
+        btn.innerText = '✅ จำลองการชำระเงินสำเร็จ (Instant Top-up)';
+      } catch (e) {
+        console.error(e);
+        btn.innerText = '✅ จำลองการชำระเงินสำเร็จ (Instant Top-up)';
+      }
+    }
+
+    // RBAC User Management
+    async function loadUsersData() {
+      try {
+        const res = await fetch('/api/users');
+        const data = await res.json();
+        const tbody = document.getElementById('table-users');
+        tbody.innerHTML = '';
+        data.users.forEach(u => {
+          const isCurrent = u.id === data.current_user.id;
+          const switchBtn = isCurrent
+            ? `<span class="bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded text-[10px]">ใช้งานอยู่</span>`
+            : `<button onclick="switchUserDirect('${u.id}')" class="text-blue-600 hover:text-blue-800 font-semibold">สลับบัญชี</button>`;
+
+          const row = `
+            <tr class="hover:bg-slate-50/60 transition">
+              <td class="py-3 px-4 font-bold text-slate-800">${u.name}</td>
+              <td class="py-3 px-4 text-slate-500">${u.username}<br><span class="text-[10px] text-slate-400">${u.email}</span></td>
+              <td class="py-3 px-4 font-semibold text-slate-700">${u.role_badge}</td>
+              <td class="py-3 px-4 font-mono font-bold text-emerald-600">${u.credits.toLocaleString()} แต้ม</td>
+              <td class="py-3 px-4 text-slate-400">${u.created_at}</td>
+              <td class="py-3 px-4 text-center">${switchBtn}</td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function switchUserDirect(userId) {
+      try {
+        await fetch('/api/switch_user', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({user_id: userId})
+        });
+        loadDashboard();
+        loadUsersData();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function openAddUserModal() {
+      document.getElementById('modal-add-user').classList.remove('hidden');
+    }
+    function closeAddUserModal() {
+      document.getElementById('modal-add-user').classList.add('hidden');
+    }
+
+    async function submitAddUser() {
+      const payload = {
+        username: document.getElementById('add-usr-username').value,
+        name: document.getElementById('add-usr-name').value,
+        email: document.getElementById('add-usr-email').value,
+        role: document.getElementById('add-usr-role').value
+      };
+      if (!payload.username || !payload.name) return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      try {
+        await fetch('/api/users', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        closeAddUserModal();
+        loadUsersData();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Call Simulation Modal
+    function openCallModal(name = "คุณจ๋า", phone = "093-340-9929", detail = null) {
+      const agentName = currentBusiness.agent_name || 'เจ้าหน้าที่ AI';
+      const bizName = currentBusiness.name || 'ศูนย์บริการ';
+      
+      document.getElementById('modal-customer-name').innerText = `${agentName} กำลังโทรหา ${name}`;
+      document.getElementById('modal-customer-phone').innerText = `${phone} • สายตรง${bizName}`;
+      document.getElementById('call-avatar').innerText = currentBusiness.agent_gender === 'male' ? '👨‍💼' : '👩‍💼';
+      
       document.getElementById('transcript-box').innerHTML = `
         <div class="text-center text-slate-400 text-xs py-4">
           กำลังหมุนเบอร์และเชื่อมต่อสัญญาณโทรศัพท์...
@@ -439,9 +1375,8 @@
       document.getElementById('call-pulse').classList.remove('hidden');
       document.getElementById('modal-call-status').innerText = 'สายกำลังเรียก (Ringing)...';
 
-      // Start actual call session on backend
       setTimeout(() => {
-        executeStartCall(name, phone);
+        executeStartCall(name, phone, detail);
       }, 1000);
     }
 
@@ -453,17 +1388,19 @@
       loadDashboard();
     }
 
-    function triggerSimForCustomer(name, phone) {
-      openCallModal(name, phone);
-    }
-
-    async function executeStartCall(name, phone) {
+    async function executeStartCall(name, phone, detail) {
       try {
         const res = await fetch('/api/start_call', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, phone: phone })
+          body: JSON.stringify({ name: name, phone: phone, detail: detail })
         });
+        if (res.status === 402) {
+          alert('เครดิตของคุณหมดแล้ว กรุณาเติมเครดิตผ่านพร้อมเพย์ก่อนเริ่มการโทรครับ');
+          closeCallModal();
+          switchTab('wallet');
+          return;
+        }
         const data = await res.json();
         currentSessionId = data.session_id;
 
@@ -498,11 +1435,7 @@
       if (!url) return;
       const player = document.getElementById('audio-player');
       player.src = url;
-      player.play().catch(e => console.log('Audio autoplay prevented:', e));
-    }
-
-    function playSavedAudio(url) {
-      playVoiceAudio(url);
+      player.play().catch(e => console.log('Autoplay handled:', e));
     }
 
     async function sendInputSpeech() {
@@ -512,7 +1445,6 @@
 
       input.value = '';
       appendMessage('ลูกค้า', text);
-
       document.getElementById('modal-call-status').innerText = 'AI กำลังประมวลผล...';
 
       try {
@@ -530,7 +1462,7 @@
         playVoiceAudio(data.audio_url);
 
         if (data.call_status === 'ended') {
-          document.getElementById('modal-call-status').innerText = `จบสายแล้ว: ${data.outcome}`;
+          document.getElementById('modal-call-status').innerText = `จบสายแล้ว: ${data.outcome} (หัก 1 เครดิต)`;
           document.getElementById('call-pulse').classList.add('hidden');
         } else {
           document.getElementById('modal-call-status').innerText = 'สายกำลังสนทนา (Live)';
@@ -551,17 +1483,16 @@
       document.getElementById('call-pulse').classList.add('hidden');
       setTimeout(() => {
         closeCallModal();
-      }, 800);
+      }, 700);
     }
 
-    // Web Speech API for Browser Mic
+    // Web Speech API
     function initSpeech() {
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         speechRecognizer = new SpeechRec();
         speechRecognizer.lang = 'th-TH';
         speechRecognizer.continuous = false;
-        speechRecognizer.interimResults = false;
 
         speechRecognizer.onresult = function(event) {
           const transcript = event.results[0][0].transcript;
@@ -580,10 +1511,7 @@
 
     function toggleMic() {
       if (!speechRecognizer) initSpeech();
-      if (!speechRecognizer) {
-        alert('เบราว์เซอร์ไม่รองรับ Web Speech API แนะนำให้เปิดบน Google Chrome / Microsoft Edge หรือพิมพ์ข้อความในช่องตอบกลับได้เลยครับ');
-        return;
-      }
+      if (!speechRecognizer) return alert('เบราว์เซอร์ไม่รองรับไมโครโฟน แนะนำให้เปิดบน Google Chrome ครับ');
 
       const btn = document.getElementById('btn-mic');
       if (!isMicRecording) {
@@ -601,7 +1529,7 @@
       }
     }
 
-    // Start
+    // Startup
     loadDashboard();
     initSpeech();
   </script>
