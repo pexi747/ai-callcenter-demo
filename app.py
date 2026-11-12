@@ -23,6 +23,12 @@ import dotenv
 from gtts import gTTS
 from google import genai
 from google.genai import types
+from sip_engine import (
+    SIPCallSession,
+    verify_sip_registration,
+    decode_audio_file_to_pcm8k,
+    save_pcm8k_to_wav,
+)
 
 # Load environment
 dotenv.load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
@@ -474,14 +480,18 @@ customers_queue = [
 ]
 
 # -------------------------------------------------------------
-# 6. Calls DB & Active Sessions
+# 6. Calls DB & Persistent Call Audit Logs
 # -------------------------------------------------------------
-calls_db = [
+CALL_LOGS_FILE = Path(__file__).resolve().parent / "call_logs.json"
+
+DEFAULT_CALLS_DB = [
     {
         "id": "call-001",
         "name": "คุณอาย",
         "phone": "084-148-7979",
         "script_name": "คลินิก: ยืนยันนัดตรวจผิว & เลเซอร์",
+        "trunk_route": "NT Link VoIP (NT NextGen) [02-107-8407]",
+        "call_mode": "sip_live",
         "job_ref": "20261030_1 (TK-1001)",
         "time": "30 ต.ค. 16:59",
         "status": "สำเร็จแล้ว",
@@ -489,13 +499,30 @@ calls_db = [
         "appointment_outcome": "มาตามนัด",
         "has_new_date": "-",
         "summary": "ยืนยันเข้ารับบริการตามนัดหมายเดิม วันที่ 2 พ.ย. เวลา 14:00 น.",
-        "audio_file": None
+        "audio_file": None,
+        "recording_file": None,
+        "transcript": [
+            {"speaker": "AI", "text": "สวัสดีค่ะ ขอเรียนสายคุณอาย จากเดอร์มา แคร์ คลินิก ค่ะ ไม่ทราบว่าสะดวกคุยสักครู่ไหมคะ", "time": "16:59:02", "audio": None},
+            {"speaker": "Customer", "text": "ใช่ค่ะ สะดวกคุยค่ะ", "time": "16:59:10", "audio": None},
+            {"speaker": "AI", "text": "ขออนุญาตโทรมาคอนเฟิร์มนัดตรวจสภาพผิวและทำเลเซอร์กับคุณหมอ วันที่ 2 พ.ย. เวลา 14:00 น. สะดวกมาตามนัดไหมคะ", "time": "16:59:14", "audio": None},
+            {"speaker": "Customer", "text": "สะดวกตามนัดเลยค่ะ ขอบคุณนะคะ", "time": "16:59:22", "audio": None},
+            {"speaker": "AI", "text": "ขอบพระคุณมากค่ะ ทางคลินิกบันทึกการยืนยันเรียบร้อยแล้วค่ะ แล้วพบกันนะคะ สวัสดีค่ะ", "time": "16:59:26", "audio": None}
+        ],
+        "sip_events": [
+            "[16:59:00] SIP REGISTER 200 OK (021078407@sip.ntnextgen.com -> 202.129.60.40:5060)",
+            "[16:59:01] SIP INVITE sip:0841487979@sip.ntnextgen.com",
+            "[16:59:01] 180 Ringing",
+            "[16:59:02] 200 OK (Connected RTP G.711 PCMU 8000Hz)",
+            "[16:59:27] SIP BYE (200 OK)"
+        ]
     },
     {
         "id": "call-002",
         "name": "คุณจ๋า",
         "phone": "093-340-9929",
         "script_name": "คลินิก: ยืนยันนัดตรวจผิว & เลเซอร์",
+        "trunk_route": "NT Link VoIP (NT NextGen) [02-107-8407]",
+        "call_mode": "sip_live",
         "job_ref": "20261025_1 (db0016)",
         "time": "25 ต.ค. 11:33",
         "status": "สำเร็จแล้ว",
@@ -503,13 +530,26 @@ calls_db = [
         "appointment_outcome": "ยกเลิกนัด",
         "has_new_date": "-",
         "summary": "โทรติดแต่ปลายสายแจ้งว่าเป็นผู้ชาย ไม่ใช่คุณจ๋า AI จึงขออภัยเนื่องจากน่าจะโทรผิดเบอร์แล้ววางสายไป",
-        "audio_file": None
+        "audio_file": None,
+        "recording_file": None,
+        "transcript": [
+            {"speaker": "AI", "text": "สวัสดีค่ะ ขอเรียนสายคุณจ๋า จากเดอร์มา แคร์ คลินิก ค่ะ", "time": "11:33:05", "audio": None},
+            {"speaker": "Customer", "text": "ขอโทษครับ โทรผิดเบอร์แล้วครับ ผมเป็นผู้ชาย", "time": "11:33:12", "audio": None},
+            {"speaker": "AI", "text": "กราบขออภัยเป็นอย่างยิ่งค่ะ น่าจะมีการบันทึกเบอร์โทรศัพท์ผิดพลาด ขออนุญาตวางสายนะคะ ขอบคุณค่ะ", "time": "11:33:17", "audio": None}
+        ],
+        "sip_events": [
+            "[11:33:03] SIP INVITE sip:0933409929@sip.ntnextgen.com",
+            "[11:33:05] 200 OK (Connected RTP G.711)",
+            "[11:33:21] SIP BYE"
+        ]
     },
     {
         "id": "call-003",
         "name": "คุณทักษิณทร์",
         "phone": "095-307-3480",
         "script_name": "อู่ยนต์: เตือนเช็คระยะ 50,000 กม.",
+        "trunk_route": "NT Link VoIP (NT NextGen) [02-107-8407]",
+        "call_mode": "sip_live",
         "job_ref": "20261027_2",
         "time": "27 ต.ค. 13:48",
         "status": "สำเร็จแล้ว",
@@ -517,13 +557,26 @@ calls_db = [
         "appointment_outcome": "ขอเลื่อนนัด",
         "has_new_date": "ใช่ (5 พ.ย. 15:00 น.)",
         "summary": "ลูกค้าติดงานด่วน ขอเลื่อนนัดจากวันที่ 28 ต.ค. เป็นวันที่ 5 พ.ย. เวลา 15:00 น. ลงบันทึกเข้าระบบเรียบร้อย",
-        "audio_file": None
+        "audio_file": None,
+        "recording_file": None,
+        "transcript": [
+            {"speaker": "AI", "text": "สวัสดีครับ ขอเรียนสายคุณทักษิณทร์ จากออโต้ แคร์ เซอร์วิส ครับ สะดวกคุยสักครู่ไหมครับ", "time": "13:48:10", "audio": None},
+            {"speaker": "Customer", "text": "ติดธุระด่วนเลยครับ ขอเลื่อนเป็นวันที่ 5 พ.ย. บ่ายสามได้ไหมครับ", "time": "13:48:25", "audio": None},
+            {"speaker": "AI", "text": "รับทราบครับ ได้บันทึกคำขอเลื่อนนัดหมายเป็นวันที่ 5 พ.ย. เวลา 15:00 น. เรียบร้อยแล้วครับ ขอบคุณครับ", "time": "13:48:32", "audio": None}
+        ],
+        "sip_events": [
+            "[13:48:08] SIP INVITE sip:0953073480@sip.ntnextgen.com",
+            "[13:48:10] 200 OK (Connected RTP G.711)",
+            "[13:49:35] SIP BYE"
+        ]
     },
     {
         "id": "call-004",
         "name": "คุณมั่ม",
         "phone": "084-007-9950",
         "script_name": "อสังหาฯ: นัดหมายเข้าชมห้องตัวอย่างคอนโด",
+        "trunk_route": "NT Link VoIP (NT NextGen) [02-107-8407]",
+        "call_mode": "sip_live",
         "job_ref": "20261030_1",
         "time": "31 ต.ค. 12:00",
         "status": "ไม่สำเร็จ ไม่มีผู้รับสาย",
@@ -531,10 +584,133 @@ calls_db = [
         "appointment_outcome": "ติดต่อไม่ได้",
         "has_new_date": "-",
         "summary": "โทร 3 ครั้ง ไม่มีผู้รับสาย บันทึกเข้าคิวโทรติดตามผลในวันถัดไป",
-        "audio_file": None
+        "audio_file": None,
+        "recording_file": None,
+        "transcript": [],
+        "sip_events": [
+            "[12:00:01] SIP INVITE sip:0840079950@sip.ntnextgen.com",
+            "[12:00:02] 180 Ringing",
+            "[12:00:32] 480 Temporarily Unavailable (No Answer)"
+        ]
     }
 ]
 
+
+def load_calls_db() -> list:
+    if CALL_LOGS_FILE.exists():
+        try:
+            data = json.loads(CALL_LOGS_FILE.read_text(encoding="utf-8"))
+            if isinstance(data, list) and len(data) > 0:
+                return data
+        except Exception as e:
+            print("load_calls_db warning:", e)
+    return [dict(item) for item in DEFAULT_CALLS_DB]
+
+
+def save_calls_db():
+    try:
+        CALL_LOGS_FILE.write_text(
+            json.dumps(calls_db, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    except Exception as e:
+        print("save_calls_db warning:", e)
+
+
+def build_combined_session_wav(session_id: str, transcript: list) -> str:
+    wav_filename = f"rec_{session_id}.wav"
+    wav_path = AUDIO_DIR / wav_filename
+    if wav_path.exists() and wav_path.stat().st_size > 16000:
+        return f"/audio/{wav_filename}"
+
+    combined_pcm = bytearray()
+    silence_gap = b"\x00\x00" * 2400  # 0.3s silence between turns
+    for turn in transcript:
+        audio_url = turn.get("audio")
+        if audio_url:
+            fpath = AUDIO_DIR / os.path.basename(audio_url)
+            pcm = decode_audio_file_to_pcm8k(fpath)
+            if pcm:
+                combined_pcm.extend(pcm)
+                combined_pcm.extend(silence_gap)
+
+    if save_pcm8k_to_wav(bytes(combined_pcm), wav_path):
+        return f"/audio/{wav_filename}"
+    return ""
+
+
+def finalize_and_record_call_session(
+    session_id: str,
+    outcome: str = "สำเร็จแล้ว",
+    has_new_date: str = "-",
+    summary: str = "",
+    last_audio_url: str = None,
+) -> dict:
+    global current_user
+    session = active_sessions.get(session_id)
+    if not session:
+        return {}
+    if session.get("logged_to_db"):
+        return session["logged_to_db"]
+
+    sip_call: SIPCallSession = session.get("sip_call")
+    recording_url = None
+    sip_events = []
+    if sip_call:
+        recording_url = sip_call.hangup()
+        sip_events = list(sip_call.sip_events)
+
+    built_wav = build_combined_session_wav(session_id, session.get("transcript", []))
+    if built_wav:
+        recording_url = built_wav
+
+    if current_user["credits"] > 0:
+        current_user["credits"] -= 1
+        for u in USERS_DB:
+            if u["id"] == current_user["id"]:
+                u["credits"] = current_user["credits"]
+
+    duration_sec = max(int((datetime.now() - session["created_at"]).total_seconds()), 12)
+    active_script = session.get("active_script", {})
+    if not summary:
+        summary = f"สนทนากับ {session['customer_name']} ({len(session.get('transcript', []))} ข้อความ) ผ่านคู่สาย {session.get('trunk_route')}"
+
+    if not sip_events:
+        sip_events = [
+            f"[{session['created_at'].strftime('%H:%M:%S')}] เริ่มสายสนทนาผ่าน {session.get('trunk_route')}",
+            f"[{datetime.now().strftime('%H:%M:%S')}] จบการสนทนาและบันทึกไฟล์เสียง ({recording_url or last_audio_url})"
+        ]
+
+    log_entry = {
+        "id": f"call-{session_id[:6]}",
+        "session_id": session_id,
+        "name": session["customer_name"],
+        "phone": session["customer_phone"],
+        "script_name": active_script.get("name", "สคริปต์มาตรฐาน"),
+        "trunk_route": session.get(
+            "trunk_route",
+            f"{telephony_config['provider_name']} [{telephony_config['caller_id']}]",
+        ),
+        "call_mode": "sip_live" if session.get("dial_real_sip") else "web_sim",
+        "job_ref": f"{datetime.now().strftime('%Y%m%d')}_AI",
+        "time": datetime.now().strftime("%d %b %H:%M"),
+        "status": "สำเร็จแล้ว",
+        "duration": f"{duration_sec // 60}:{duration_sec % 60:02d}",
+        "appointment_outcome": outcome,
+        "has_new_date": has_new_date,
+        "summary": summary,
+        "audio_file": recording_url or last_audio_url,
+        "recording_file": recording_url or last_audio_url,
+        "transcript": session.get("transcript", []),
+        "sip_events": sip_events,
+    }
+    calls_db.insert(0, log_entry)
+    save_calls_db()
+    session["logged_to_db"] = log_entry
+    return log_entry
+
+
+calls_db = load_calls_db()
 active_sessions = {}
 
 # -------------------------------------------------------------
@@ -605,7 +781,8 @@ def generate_system_prompt_from_script(script: dict) -> str:
 async def get_audio(filename: str):
     file_path = AUDIO_DIR / filename
     if file_path.exists():
-        return FileResponse(file_path, media_type="audio/mpeg")
+        media_type = "audio/wav" if filename.lower().endswith(".wav") else "audio/mpeg"
+        return FileResponse(file_path, media_type=media_type)
     return JSONResponse(status_code=404, content={"error": "Audio not found"})
 
 @app.get("/api/dashboard_data")
@@ -972,6 +1149,17 @@ async def start_call(data: dict):
             chat_session = None
             
     active_trunk = f"{telephony_config.get('provider_name', 'VoIP Gateway')} [{telephony_config.get('caller_id', '02-107-8407')}]"
+    dial_real_sip = bool(data.get("dial_real_sip", False))
+    sip_call = None
+
+    if dial_real_sip:
+        sip_call = SIPCallSession(
+            session_id=session_id,
+            config=telephony_config,
+            target_phone=customer_phone,
+            audio_dir=AUDIO_DIR,
+        )
+        sip_call.start_outbound_call(initial_audio_url=audio_url)
 
     active_sessions[session_id] = {
         "customer_name": customer_name,
@@ -980,10 +1168,19 @@ async def start_call(data: dict):
         "active_script": active_script,
         "chat_session": chat_session,
         "trunk_route": active_trunk,
+        "dial_real_sip": dial_real_sip,
+        "sip_call": sip_call,
         "created_at": datetime.now(),
-        "transcript": [{"speaker": "AI", "text": opening_text, "audio": audio_url}]
+        "transcript": [
+            {
+                "speaker": "AI",
+                "text": opening_text,
+                "time": datetime.now().strftime("%H:%M:%S"),
+                "audio": audio_url,
+            }
+        ],
     }
-    
+
     return {
         "session_id": session_id,
         "speech": opening_text,
@@ -993,7 +1190,10 @@ async def start_call(data: dict):
         "agent_name": active_script.get("agent_name"),
         "agent_gender": active_script.get("agent_gender", "female"),
         "script_name": active_script.get("name"),
-        "trunk_route": active_trunk
+        "trunk_route": active_trunk,
+        "dial_real_sip": dial_real_sip,
+        "sip_state": sip_call.state if sip_call else "web_sim",
+        "sip_events": sip_call.sip_events if sip_call else [],
     }
 
 @app.post("/api/chat")
@@ -1007,7 +1207,15 @@ async def chat(data: dict):
     
     session = active_sessions[session_id]
     active_script = session.get("active_script", active_business)
-    session["transcript"].append({"speaker": "Customer", "text": user_speech, "audio": None})
+    sip_call: SIPCallSession = session.get("sip_call")
+    if sip_call:
+        sip_call.clear_ai_audio_queue()
+    session["transcript"].append({
+        "speaker": "Customer",
+        "text": user_speech,
+        "time": datetime.now().strftime("%H:%M:%S"),
+        "audio": None,
+    })
     
     result = None
     if session.get("chat_session"):
@@ -1066,41 +1274,93 @@ async def chat(data: dict):
         speed=float(active_script.get("speed", 1.0)),
         filename_prefix="turn"
     )
-    session["transcript"].append({"speaker": "AI", "text": ai_speech, "audio": audio_url})
-    
-    # When call ends: Deduct 1 credit & log into calls_db
+    session["transcript"].append({
+        "speaker": "AI",
+        "text": ai_speech,
+        "time": datetime.now().strftime("%H:%M:%S"),
+        "audio": audio_url,
+    })
+    if sip_call and audio_url:
+        sip_call.enqueue_ai_audio_file(audio_url)
+
+    log_entry = None
     if call_status == "ended":
-        if current_user["credits"] > 0:
-            current_user["credits"] -= 1
-            for u in USERS_DB:
-                if u["id"] == current_user["id"]:
-                    u["credits"] = current_user["credits"]
-                    
-        duration_sec = max(int((datetime.now() - session["created_at"]).total_seconds()), 14)
-        calls_db.insert(0, {
-            "id": f"call-{uuid.uuid4().hex[:6]}",
-            "name": session["customer_name"],
-            "phone": session["customer_phone"],
-            "script_name": active_script.get("name", "สคริปต์มาตรฐาน"),
-            "trunk_route": session.get("trunk_route", f"{telephony_config['provider_name']} [{telephony_config['caller_id']}]"),
-            "job_ref": f"{datetime.now().strftime('%Y%m%d')}_AI",
-            "time": datetime.now().strftime("%d %b %H:%M"),
-            "status": "สำเร็จแล้ว",
-            "duration": f"0:{duration_sec:02d}",
-            "appointment_outcome": outcome,
-            "has_new_date": has_new_date,
-            "summary": summary,
-            "audio_file": audio_url
-        })
-        
+        log_entry = finalize_and_record_call_session(
+            session_id=session_id,
+            outcome=outcome,
+            has_new_date=has_new_date,
+            summary=summary,
+            last_audio_url=audio_url,
+        )
+
     return {
         "speech": ai_speech,
         "audio_url": audio_url,
+        "recording_file": log_entry.get("recording_file") if log_entry else None,
+        "call_id": log_entry.get("id") if log_entry else None,
         "call_status": call_status,
         "outcome": outcome,
         "summary": summary,
-        "credits_remaining": current_user["credits"]
+        "credits_remaining": current_user["credits"],
     }
+
+
+@app.post("/api/hangup")
+async def hangup_call_endpoint(data: dict):
+    session_id = data.get("session_id")
+    if not session_id or session_id not in active_sessions:
+        return {"success": True, "message": "ไม่มีสายที่กำลังสนทนา"}
+    session = active_sessions[session_id]
+    outcome = data.get("outcome") or "วางสาย"
+    summary = data.get("summary") or f"บันทึกการสนทนา ({len(session.get('transcript', []))} ข้อความ)"
+    log_entry = finalize_and_record_call_session(
+        session_id=session_id,
+        outcome=outcome,
+        has_new_date="-",
+        summary=summary,
+    )
+    return {
+        "success": True,
+        "call_log": log_entry,
+        "recording_file": log_entry.get("recording_file"),
+        "credits_remaining": current_user["credits"],
+    }
+
+
+@app.get("/api/sip/status/{session_id}")
+async def get_sip_session_status(session_id: str):
+    session = active_sessions.get(session_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found"})
+    sip_call: SIPCallSession = session.get("sip_call")
+    if not sip_call:
+        return {
+            "session_id": session_id,
+            "dial_real_sip": False,
+            "sip_state": "web_sim",
+            "sip_events": [],
+        }
+    return {
+        "session_id": session_id,
+        "dial_real_sip": True,
+        "sip_state": sip_call.state,
+        "sip_events": sip_call.sip_events,
+        "target_number": sip_call.target_number,
+        "proxy_ip": sip_call.proxy_ip,
+    }
+
+
+@app.get("/api/calls")
+async def list_call_logs():
+    return {"calls": calls_db}
+
+
+@app.get("/api/calls/{call_id}")
+async def get_call_log_detail(call_id: str):
+    item = next((c for c in calls_db if c.get("id") == call_id), None)
+    if not item:
+        return JSONResponse(status_code=404, content={"error": "Call log not found"})
+    return item
 
 # -------------------------------------------------------------
 # 16. Endpoints: Telephony Gateway & SIP/GSM Configuration
@@ -1138,17 +1398,10 @@ async def update_telephony(data: dict):
 @app.post("/api/telephony/test_connection")
 async def test_telephony_ping(data: dict = None):
     global telephony_config
-    import random
-    latency = random.randint(12, 24)
-    telephony_config["status"] = "registered"
-    telephony_config["latency_ms"] = latency
-    proxy_str = f" (Proxy: {telephony_config['sip_proxy']})" if telephony_config.get("sip_proxy") else ""
-    return {
-        "success": True,
-        "status": "registered",
-        "latency_ms": latency,
-        "message": f"SIP OPTIONS Ping สำเร็จ: {telephony_config['server_host']}:{telephony_config['server_port']}{proxy_str} [User: {telephony_config.get('auth_username', '')}] ตอบสนองใน {latency}ms (สถานะ Registered)"
-    }
+    reg_result = await asyncio.to_thread(verify_sip_registration, telephony_config)
+    telephony_config["status"] = reg_result["status"]
+    telephony_config["latency_ms"] = reg_result["latency_ms"]
+    return reg_result
 
 # -------------------------------------------------------------
 # 17. Endpoints: White-Label Branding System

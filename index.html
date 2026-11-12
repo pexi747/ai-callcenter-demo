@@ -1197,11 +1197,20 @@
           <span>🌐</span>
           <span id="modal-trunk-badge">NT Link VoIP (NT NextGen) [02-107-8407]</span>
         </div>
-        
+
+        <!-- Real SIP Outbound Dialing Toggle -->
+        <div class="mt-2 flex items-center justify-center space-x-2">
+          <label class="inline-flex items-center space-x-1.5 bg-emerald-950/80 border border-emerald-400/40 px-3 py-1 rounded-full cursor-pointer text-[11px] text-emerald-200">
+            <input type="checkbox" id="toggle-real-sip" checked class="accent-emerald-500 rounded cursor-pointer">
+            <span>📡 ยิงสายโทรออกจริงผ่าน SIP Trunk (02-107-8407) + บันทึกเสียง .wav</span>
+          </label>
+        </div>
+
         <!-- Status indicator including Barge-in state -->
         <div id="modal-call-status" class="mt-2 inline-block bg-blue-900/60 text-blue-200 text-xs px-3 py-1 rounded-full font-medium transition-all">
           กำลังเตรียมสัญญาณ...
         </div>
+        <div id="modal-sip-live-log" class="mt-1 text-[10px] font-mono text-indigo-200 truncate max-w-md mx-auto"></div>
       </div>
 
       <!-- Dialogue History -->
@@ -1247,6 +1256,83 @@
         </button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: CALL LOG & RECORDING AUDIT VIEWER (ตรวจสอบย้อนหลัง) -->
+  <!-- ============================================================== -->
+  <div id="modal-call-detail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-lg">📋</span>
+            <h3 id="detail-modal-title" class="font-bold text-sm">ประวัติการสนทนาและไฟล์เสียงบันทึกย้อนหลัง</h3>
+            <span id="detail-modal-mode" class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] px-2 py-0.5 rounded-full font-mono">SIP LIVE</span>
+          </div>
+          <p id="detail-modal-subtitle" class="text-[11px] text-slate-400 mt-0.5 font-mono"></p>
+        </div>
+        <button onclick="closeCallDetailModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+
+      <div class="p-6 space-y-4 overflow-y-auto text-xs">
+        <!-- Audio Recording Player Box -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-slate-800 flex items-center space-x-1.5">
+              <span>🎧</span>
+              <span>ไฟล์เสียงบันทึกการสนทนา (Recorded Call Audio)</span>
+            </span>
+            <a id="detail-download-audio" href="#" download class="text-blue-600 hover:text-blue-800 font-semibold text-[11px] underline">
+              ⬇️ ดาวน์โหลดไฟล์เสียง
+            </a>
+          </div>
+          <audio id="detail-audio-player" controls class="w-full h-9"></audio>
+        </div>
+
+        <!-- Call Summary & Outcome -->
+        <div class="grid grid-cols-3 gap-3 bg-blue-50/50 p-3.5 rounded-xl border border-blue-100">
+          <div>
+            <span class="text-[10px] text-slate-400 block">ผลการนัดหมาย (Outcome)</span>
+            <span id="detail-modal-outcome" class="font-bold text-blue-700 text-xs">-</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 block">คู่สายที่ใช้โทรออก (Trunk)</span>
+            <span id="detail-modal-trunk" class="font-mono font-semibold text-slate-700 text-[11px]">-</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 block">เวลาคุย / สถานะ</span>
+            <span id="detail-modal-duration" class="font-semibold text-emerald-700 text-xs">-</span>
+          </div>
+          <div class="col-span-3 pt-2 border-t border-blue-100">
+            <span class="text-[10px] text-slate-400 block">สรุปผลการโทรโดย AI (Call Summary)</span>
+            <p id="detail-modal-summary" class="text-slate-700 mt-0.5 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <!-- Conversation Transcript -->
+        <div>
+          <h4 class="font-bold text-slate-800 mb-2">💬 บันทึกข้อความที่สนทนา (Full Conversation Transcript)</h4>
+          <div id="detail-transcript-list" class="space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-200 max-h-60 overflow-y-auto">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- SIP Signaling Trace -->
+        <div>
+          <h4 class="font-bold text-slate-700 mb-1.5 text-[11px]">📡 บันทึกเหตุการณ์สัญญาณโทรศัพท์ (SIP / RTP Signaling Trace)</h4>
+          <div id="detail-sip-events" class="bg-slate-900 text-emerald-400 font-mono text-[11px] p-3 rounded-xl space-y-1 max-h-36 overflow-y-auto">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeCallDetailModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1.5 rounded-lg text-xs font-semibold">
+          ปิดหน้าต่าง
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1368,9 +1454,11 @@
           }
 
           const statusColor = call.status.includes('สำเร็จ') ? 'text-emerald-600 font-medium' : 'text-rose-600 font-medium';
-          const audioBtn = call.audio_file 
-            ? `<button onclick="playVoiceAudio('${call.audio_file}')" class="text-blue-600 hover:text-blue-800 font-medium">🎧 ฟังเสียง</button>`
+          const recUrl = call.recording_file || call.audio_file;
+          const audioBtn = recUrl 
+            ? `<button onclick="playVoiceAudio('${recUrl}')" class="text-blue-600 hover:text-blue-800 font-medium" title="ฟังเสียงบันทึกทันที">🎧 ฟังเสียง</button>`
             : `<span class="text-slate-400">🎧 ฟัง</span>`;
+          const logDetailBtn = `<button onclick="openCallDetailModal('${call.id}')" class="bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-300 px-2 py-0.5 rounded text-[11px] font-semibold transition" title="ดูบทสนทนาและไฟล์เสียงย้อนหลัง">📋 ดู Log</button>`;
 
           const row = `
             <tr class="hover:bg-slate-50/60 transition">
@@ -1391,8 +1479,9 @@
               <td class="py-3 px-4 text-slate-600">${call.has_new_date}</td>
               <td class="py-3 px-4 text-slate-600 leading-relaxed">${call.summary}</td>
               <td class="py-3 px-4 text-center">
-                <div class="flex items-center justify-center space-x-2">
+                <div class="flex items-center justify-center space-x-1.5">
                   ${audioBtn}
+                  ${logDetailBtn}
                   <button onclick="openCallModal('${call.name}', '${call.phone}')" class="text-slate-400 hover:text-blue-600" title="โทรออก">📞</button>
                 </div>
               </td>
@@ -2030,7 +2119,13 @@
       activeCallScriptId = val;
     }
 
+    let sipStatusTimer = null;
+
     function closeCallModal() {
+      if (sipStatusTimer) {
+        clearInterval(sipStatusTimer);
+        sipStatusTimer = null;
+      }
       document.getElementById('call-modal').classList.add('hidden');
       document.getElementById('call-pulse').classList.add('hidden');
       const audio = document.getElementById('audio-player');
@@ -2039,8 +2134,24 @@
       loadDashboard();
     }
 
+    async function pollSipStatus() {
+      if (!currentSessionId) return;
+      try {
+        const res = await fetch(`/api/sip/status/${currentSessionId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const logEl = document.getElementById('modal-sip-live-log');
+        if (logEl && data.sip_events && data.sip_events.length > 0) {
+          logEl.innerText = data.sip_events[data.sip_events.length - 1];
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     async function executeStartCall(name, phone, detail, scriptId) {
       try {
+        const dialRealSip = document.getElementById('toggle-real-sip')?.checked ?? true;
         const res = await fetch('/api/start_call', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2048,7 +2159,8 @@
             name: name,
             phone: phone,
             detail: detail,
-            script_id: activeCallScriptId || scriptId
+            script_id: activeCallScriptId || scriptId,
+            dial_real_sip: dialRealSip
           })
         });
         if (res.status === 402) {
@@ -2063,8 +2175,16 @@
         document.getElementById('modal-customer-name').innerText = `${data.agent_name} กำลังสนทนากับ ${name}`;
         document.getElementById('modal-customer-phone').innerText = `${phone} • ${data.business_name} (${data.script_name})`;
         document.getElementById('call-avatar').innerText = data.agent_gender === 'male' ? '👨‍💼' : '👩‍💼';
-        document.getElementById('modal-call-status').innerText = 'สายติดแล้ว (Connected)';
+        document.getElementById('modal-call-status').innerText = dialRealSip
+          ? '📡 กำลังโทรออกผ่าน SIP Trunk & บันทึกเสียงสนทนา...'
+          : 'สายติดแล้ว (Connected)';
         document.getElementById('transcript-box').innerHTML = '';
+
+        if (dialRealSip) {
+          if (sipStatusTimer) clearInterval(sipStatusTimer);
+          sipStatusTimer = setInterval(pollSipStatus, 1000);
+          pollSipStatus();
+        }
 
         appendMessage(data.agent_name || 'AI', data.speech);
         playVoiceAudio(data.audio_url);
@@ -2140,14 +2260,107 @@
       sendInputSpeech();
     }
 
-    function hangupCall() {
+    async function hangupCall() {
       stopAIAudio('วางสาย');
-      appendMessage('ระบบ', 'สายถูกตัดแล้ว');
-      document.getElementById('modal-call-status').innerText = 'วางสายเรียบร้อย';
+      if (sipStatusTimer) {
+        clearInterval(sipStatusTimer);
+        sipStatusTimer = null;
+      }
+      if (currentSessionId) {
+        try {
+          await fetch('/api/hangup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: currentSessionId })
+          });
+        } catch (e) {
+          console.error('Hangup error:', e);
+        }
+      }
+      appendMessage('ระบบ', 'สายถูกตัดและบันทึกไฟล์เสียง + ข้อความลงใน Log เรียบร้อย');
+      document.getElementById('modal-call-status').innerText = 'วางสายและบันทึก Log เรียบร้อย';
       document.getElementById('call-pulse').classList.add('hidden');
+      showToast('บันทึกเสียงสนทนาและข้อความลงในประวัติเรียบร้อย!');
       setTimeout(() => {
         closeCallModal();
       }, 600);
+    }
+
+    async function openCallDetailModal(callId) {
+      try {
+        const res = await fetch(`/api/calls/${callId}`);
+        if (!res.ok) return alert('ไม่พบข้อมูลประวัติสายนี้');
+        const call = await res.json();
+
+        document.getElementById('detail-modal-title').innerText = `ประวัติการสนทนา: ${call.name} (${call.phone})`;
+        document.getElementById('detail-modal-subtitle').innerText = `รหัสอ้างอิง: ${call.id} • เวลา: ${call.time} • ชุดสคริปต์: ${call.script_name || '-'}`;
+        document.getElementById('detail-modal-mode').innerText = call.call_mode === 'sip_live' ? '📡 SIP VOIP' : '🌐 WEB SIM';
+        document.getElementById('detail-modal-outcome').innerText = call.appointment_outcome || '-';
+        document.getElementById('detail-modal-trunk').innerText = call.trunk_route || 'NT Link VoIP [02-107-8407]';
+        document.getElementById('detail-modal-duration').innerText = `${call.status} (${call.duration})`;
+        document.getElementById('detail-modal-summary').innerText = call.summary || '-';
+
+        const recUrl = call.recording_file || call.audio_file || '';
+        const player = document.getElementById('detail-audio-player');
+        const dlBtn = document.getElementById('detail-download-audio');
+        if (recUrl) {
+          player.src = recUrl;
+          dlBtn.href = recUrl;
+          dlBtn.classList.remove('hidden');
+        } else {
+          player.removeAttribute('src');
+          dlBtn.classList.add('hidden');
+        }
+
+        const tList = document.getElementById('detail-transcript-list');
+        tList.innerHTML = '';
+        const transcript = call.transcript || [];
+        if (transcript.length === 0) {
+          tList.innerHTML = '<p class="text-slate-400 italic text-center py-3">ไม่มีข้อความสนทนา (ปลายสายไม่รับสาย)</p>';
+        } else {
+          transcript.forEach(item => {
+            const isAI = item.speaker === 'AI';
+            const playTurnBtn = item.audio
+              ? `<button onclick="playVoiceAudio('${item.audio}')" class="ml-2 text-[10px] text-blue-600 hover:underline">🔊 ฟังประโยคนี้</button>`
+              : '';
+            tList.innerHTML += `
+              <div class="flex ${isAI ? 'justify-start' : 'justify-end'}">
+                <div class="max-w-[85%] rounded-xl px-3.5 py-2 border ${
+                  isAI ? 'bg-white border-slate-200 text-slate-800' : 'bg-blue-600 border-blue-600 text-white'
+                }">
+                  <div class="flex items-center justify-between space-x-2 mb-0.5">
+                    <span class="font-bold text-[10px] ${isAI ? 'text-blue-600' : 'text-blue-100'}">${isAI ? '🤖 AI Agent' : '👤 ลูกค้า'}</span>
+                    <span class="text-[10px] ${isAI ? 'text-slate-400' : 'text-blue-200'} font-mono">${item.time || ''}</span>
+                  </div>
+                  <p class="text-xs leading-relaxed">${item.text}</p>
+                  ${isAI ? playTurnBtn : ''}
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        const sipBox = document.getElementById('detail-sip-events');
+        sipBox.innerHTML = '';
+        const events = call.sip_events || [];
+        if (events.length === 0) {
+          sipBox.innerHTML = '<div>[System] บันทึกสายสำเร็จ</div>';
+        } else {
+          events.forEach(ev => {
+            sipBox.innerHTML += `<div>${ev}</div>`;
+          });
+        }
+
+        document.getElementById('modal-call-detail').classList.remove('hidden');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function closeCallDetailModal() {
+      const player = document.getElementById('detail-audio-player');
+      if (player) player.pause();
+      document.getElementById('modal-call-detail').classList.add('hidden');
     }
 
     // Web Speech API with Built-in Barge-In Hooks
