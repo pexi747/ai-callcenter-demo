@@ -223,16 +223,22 @@ SCRIPTS_DB = [
 TELEPHONY_PROVIDERS = {
     "nt_link": {
         "provider": "nt_link",
-        "provider_name": "NT Link VoIP (National Telecom)",
-        "server_host": "sip.ntlink.tot.co.th",
-        "server_port": 5060,
-        "auth_username": "021234567",
-        "auth_password": "••••••••",
-        "caller_id": "02-123-4567",
+        "provider_name": "NT Link VoIP (NT NextGen)",
+        "server_host": os.environ.get("NT_SIP_DOMAIN", "sip.ntnextgen.com"),
+        "server_port": int(os.environ.get("NT_SIP_PORT", 5060)),
+        "sip_proxy": os.environ.get("NT_SIP_PROXY", "res.ntnextgen.com"),
+        "auth_username": os.environ.get("NT_SIP_USERNAME", "021078407"),
+        "auth_password": os.environ.get("NT_SIP_PASSWORD", "8vEpQ5R3#hSm"),
+        "app_password": os.environ.get("NT_LINK_APP_PASSWORD", "H5F@P87h"),
+        "caller_id": os.environ.get("NT_CALLER_ID", "02-107-8407"),
+        "phone_number": "021078407",
+        "account_balance": 100.00,
+        "account_expiry": "2027-01-17",
+        "account_status": "พร้อมใช้งาน",
         "codec": "G.711u (PCMU)",
         "status": "registered",
-        "latency_ms": 15,
-        "active_channels": 4,
+        "latency_ms": 14,
+        "active_channels": 1,
         "max_channels": 30,
         "webhook_url": "http://127.0.0.1:8088/api/telephony/events"
     },
@@ -241,9 +247,15 @@ TELEPHONY_PROVIDERS = {
         "provider_name": "GSM Gateway (SIM Box 8 Ports)",
         "server_host": "192.168.1.100",
         "server_port": 5060,
+        "sip_proxy": "",
         "auth_username": "gsm_admin",
         "auth_password": "••••••••",
+        "app_password": "",
         "caller_id": "089-123-4567",
+        "phone_number": "0891234567",
+        "account_balance": 0.0,
+        "account_expiry": "-",
+        "account_status": "พร้อมใช้งาน",
         "codec": "G.711a (PCMA)",
         "status": "registered",
         "latency_ms": 8,
@@ -256,9 +268,15 @@ TELEPHONY_PROVIDERS = {
         "provider_name": "DTAC OneCall / Cloud PBX",
         "server_host": "sip.dtac-onecall.com",
         "server_port": 5061,
+        "sip_proxy": "",
         "auth_username": "onecall_biz",
         "auth_password": "••••••••",
+        "app_password": "",
         "caller_id": "02-998-8877",
+        "phone_number": "029988877",
+        "account_balance": 0.0,
+        "account_expiry": "-",
+        "account_status": "พร้อมใช้งาน",
         "codec": "G.729",
         "status": "registered",
         "latency_ms": 22,
@@ -271,9 +289,15 @@ TELEPHONY_PROVIDERS = {
         "provider_name": "Custom SIP Trunk / Asterisk FreePBX",
         "server_host": "pbx.company.internal",
         "server_port": 5060,
+        "sip_proxy": "",
         "auth_username": "trunk_ext100",
         "auth_password": "••••••••",
+        "app_password": "",
         "caller_id": "02-555-0199",
+        "phone_number": "025550199",
+        "account_balance": 0.0,
+        "account_expiry": "-",
+        "account_status": "พร้อมใช้งาน",
         "codec": "G.711u (PCMU)",
         "status": "registered",
         "latency_ms": 12,
@@ -947,7 +971,7 @@ async def start_call(data: dict):
             print("Chat Init Error:", e)
             chat_session = None
             
-    active_trunk = f"{telephony_config.get('provider_name', 'VoIP Gateway')} [{telephony_config.get('caller_id', '02-123-4567')}]"
+    active_trunk = f"{telephony_config.get('provider_name', 'VoIP Gateway')} [{telephony_config.get('caller_id', '02-107-8407')}]"
 
     active_sessions[session_id] = {
         "customer_name": customer_name,
@@ -1099,9 +1123,10 @@ async def update_telephony(data: dict):
                 preset[k] = v
         telephony_config = preset
     else:
-        for k in ["provider", "provider_name", "server_host", "server_port", "auth_username", 
-                  "auth_password", "caller_id", "codec", "status", "latency_ms", 
-                  "active_channels", "max_channels", "webhook_url"]:
+        for k in ["provider", "provider_name", "server_host", "server_port", "sip_proxy",
+                  "auth_username", "auth_password", "app_password", "caller_id", "phone_number",
+                  "account_balance", "account_expiry", "account_status", "codec", "status",
+                  "latency_ms", "active_channels", "max_channels", "webhook_url"]:
             if k in data and data[k] is not None:
                 telephony_config[k] = data[k]
     return {
@@ -1114,14 +1139,15 @@ async def update_telephony(data: dict):
 async def test_telephony_ping(data: dict = None):
     global telephony_config
     import random
-    latency = random.randint(12, 28)
+    latency = random.randint(12, 24)
     telephony_config["status"] = "registered"
     telephony_config["latency_ms"] = latency
+    proxy_str = f" (Proxy: {telephony_config['sip_proxy']})" if telephony_config.get("sip_proxy") else ""
     return {
         "success": True,
         "status": "registered",
         "latency_ms": latency,
-        "message": f"SIP OPTIONS Ping สำเร็จ: {telephony_config['server_host']}:{telephony_config['server_port']} ตอบสนองใน {latency}ms (สถานะ Registered)"
+        "message": f"SIP OPTIONS Ping สำเร็จ: {telephony_config['server_host']}:{telephony_config['server_port']}{proxy_str} [User: {telephony_config.get('auth_username', '')}] ตอบสนองใน {latency}ms (สถานะ Registered)"
     }
 
 # -------------------------------------------------------------
