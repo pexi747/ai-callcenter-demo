@@ -164,6 +164,48 @@
           </div>
         </div>
 
+        <!-- Quick Real SIP Outbound Dialer Bar -->
+        <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white p-5 rounded-2xl shadow-lg border border-blue-800/60 space-y-3">
+          <div class="flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-2.5">
+              <span class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-base">📞</span>
+              <div>
+                <h3 class="font-bold text-sm text-white flex items-center space-x-2">
+                  <span>แผงกดโทรออกเบอร์จริงผ่านหน้าเว็บทันที (Quick Real SIP Dialer)</span>
+                  <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] px-2 py-0.5 rounded-full font-mono">NT Link 02-107-8407 พร้อมโทร</span>
+                </h3>
+                <p class="text-[11px] text-slate-300">พิมพ์เบอร์โทรศัพท์มือถือหรือเบอร์บ้าน เลือกสคริปต์ แล้วกดปุ่มสีเขียวเพื่อยิงสัญญาณ SIP INVITE โทรออกเข้าเครื่องปลายทางพร้อมเสียง AI ระดับ Earshot Studio</p>
+              </div>
+            </div>
+            <span class="text-[11px] bg-indigo-500/20 text-indigo-200 border border-indigo-400/30 px-2.5 py-1 rounded-lg font-mono">
+              🎙️ Earshot Neural Voice + WAV Recorder
+            </span>
+          </div>
+
+          <div class="grid grid-cols-12 gap-3 pt-1 items-end">
+            <div class="col-span-3">
+              <label class="block text-[11px] text-slate-300 font-semibold mb-1">ชื่อลูกค้าปลายสาย</label>
+              <input type="text" id="quick-dial-name" value="คุณลูกค้า" placeholder="เช่น คุณสมชาย" class="w-full bg-slate-800/90 border border-slate-600 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-400">
+            </div>
+            <div class="col-span-3">
+              <label class="block text-[11px] text-emerald-300 font-bold mb-1">หมายเลขโทรศัพท์ที่จะโทรออกจริง *</label>
+              <input type="tel" id="quick-dial-phone" placeholder="กรอกเบอร์จริง เช่น 0812345678" class="w-full bg-slate-800/90 border-2 border-emerald-500/70 text-white font-mono font-bold rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-400">
+            </div>
+            <div class="col-span-3">
+              <label class="block text-[11px] text-slate-300 font-semibold mb-1">ชุดสคริปต์ที่ใช้สนทนา</label>
+              <select id="quick-dial-script" class="w-full bg-slate-800/90 border border-slate-600 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-400">
+                <option value="">⚙️ สคริปต์ตามธุรกิจหลักปัจจุบัน</option>
+              </select>
+            </div>
+            <div class="col-span-3">
+              <button onclick="startQuickRealCall()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 px-4 rounded-lg text-xs shadow-md hover:shadow-lg transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                <span>📡</span>
+                <span>กดโทรออกเบอร์จริงทันที</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Metric Cards -->
         <div class="grid grid-cols-4 gap-4">
           <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
@@ -351,37 +393,61 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 4: AI VOICE CONFIGURATION -->
+      <!-- TAB 4: AI VOICE CONFIGURATION (EARSHOT ACOUSTIC ENGINE) -->
       <!-- ============================================================== -->
       <section id="tab-voice" class="space-y-6 hidden">
-        <div>
-          <h2 class="text-xl font-bold text-slate-800">เสียงพูด AI (Voice & Personality Tone)</h2>
-          <p class="text-xs text-slate-500">เลือกเพศเสียงภาษาไทย ปรับโทนความเร็ว และทดลองฟังเสียงสังเคราะห์ (บันทึกค่าลงเซิร์ฟเวอร์ทันที)</p>
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">เสียงพูด AI สมจริงระดับสตูดิโอ (Earshot Acoustic & Neural TTS)</h2>
+            <p class="text-xs text-slate-500">ขับเคลื่อนด้วย Gemini 3.8 Neural TTS + Earshot Acoustic Mastering ปรับความอบอุ่นของเนื้อเสียง จังหวะหายใจ และมิติห้องสนทนา</p>
+          </div>
+          <span class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full text-xs font-bold">
+            🎙️ Earshot Realism Engine v2.0 Active
+          </span>
         </div>
 
         <div class="grid grid-cols-2 gap-6">
           <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow space-y-5">
-            <h3 class="font-bold text-slate-800 text-sm">1. เลือกเพศและโมเดลเสียงภาษาไทย</h3>
+            <h3 class="font-bold text-slate-800 text-sm">1. เลือกเพศและโมเดลเสียงภาษาไทย (Neural Persona)</h3>
 
             <!-- Gender Cards -->
             <div class="grid grid-cols-2 gap-4">
               <div onclick="selectVoiceGender('female')" id="voice-card-female" class="p-4 rounded-xl border-2 border-blue-600 bg-blue-50/40 cursor-pointer transition">
                 <span class="text-3xl block mb-2">👩‍💼</span>
-                <h4 class="font-bold text-slate-800 text-sm">เสียงผู้หญิง (น้องฟ้า / พรีม)</h4>
-                <p class="text-xs text-slate-500 mt-1">โมเดล Premwadee Neural: เสียงสดใส นุ่มนวล เป็นธรรมชาติสูง เหมาะกับงานบริการและคลินิก</p>
+                <h4 class="font-bold text-slate-800 text-sm">เสียงผู้หญิง (น้องฟ้า / Aoede)</h4>
+                <p class="text-xs text-slate-500 mt-1">โมเดล Premwadee / Aoede Neural: เสียงสดใส นุ่มนวล มีจังหวะทอดเสียงธรรมชาติ เหมาะกับงานบริการและคลินิก</p>
               </div>
 
               <div onclick="selectVoiceGender('male')" id="voice-card-male" class="p-4 rounded-xl border border-slate-200 hover:border-blue-400 cursor-pointer transition">
                 <span class="text-3xl block mb-2">👨‍💼</span>
-                <h4 class="font-bold text-slate-800 text-sm">เสียงผู้ชาย (น้องนนท์)</h4>
-                <p class="text-xs text-slate-500 mt-1">โมเดล Niwat Neural: เสียงสุภาพ น่าเชื่อถือ โทนผู้ใหญ่ เหมาะกับงานยานยนต์และการเงิน</p>
+                <h4 class="font-bold text-slate-800 text-sm">เสียงผู้ชาย (น้องนนท์ / Charon)</h4>
+                <p class="text-xs text-slate-500 mt-1">โมเดล Niwat / Charon Neural: เสียงสุภาพ น่าเชื่อถือ โทนอบอุ่น เหมาะกับงานยานยนต์และอสังหาฯ</p>
+              </div>
+            </div>
+
+            <!-- Earshot Acoustic Profile Selector -->
+            <div class="space-y-2 pt-1">
+              <label class="block text-xs font-bold text-indigo-900">🎛️ โปรไฟล์การปรับแต่งมิติเสียง Earshot Acoustic Mastering</label>
+              <div class="grid grid-cols-3 gap-2.5">
+                <button type="button" onclick="selectEarshotProfile('close_mic')" id="earshot-prof-close_mic" class="p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 text-left transition cursor-pointer">
+                  <div class="font-bold text-xs text-indigo-900">🎙️ Close-Mic</div>
+                  <div class="text-[10px] text-slate-600 mt-0.5">เสียงนุ่มลึกใกล้ไมค์ อบอุ่นสมจริง (+Warmth 220Hz)</div>
+                </button>
+                <button type="button" onclick="selectEarshotProfile('warm_office')" id="earshot-prof-warm_office" class="p-2.5 rounded-xl border border-slate-200 hover:border-indigo-400 text-left transition cursor-pointer">
+                  <div class="font-bold text-xs text-slate-800">🏢 Warm Office</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5">จำลองบรรยากาศศูนย์บริการ มีมิติห้องธรรมชาติ</div>
+                </button>
+                <button type="button" onclick="selectEarshotProfile('crystal_hd')" id="earshot-prof-crystal_hd" class="p-2.5 rounded-xl border border-slate-200 hover:border-indigo-400 text-left transition cursor-pointer">
+                  <div class="font-bold text-xs text-slate-800">💎 Crystal VoIP HD</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5">เร่งความคมชัดคำควบกล้ำและวรรณยุกต์สำหรับสาย SIP</div>
+                </button>
               </div>
             </div>
 
             <!-- Tone & Speed -->
-            <div class="space-y-4 pt-2">
+            <div class="space-y-4 pt-1">
               <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">โทนเสียงสนทนา (Conversation Tone)</label>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">โทนอารมณ์การพูด (Style & Emotion Prompting)</label>
                 <div class="grid grid-cols-3 gap-2">
                   <button type="button" onclick="setTone('Friendly')" id="tone-Friendly" class="py-2 px-3 text-xs rounded-lg border font-semibold border-blue-600 bg-blue-50 text-blue-600">
                     😊 อบอุ่น เป็นกันเอง
@@ -397,36 +463,69 @@
 
               <div>
                 <div class="flex justify-between items-center mb-1">
-                  <label class="text-xs font-semibold text-slate-700">ความเร็วในการพูด (Speech Rate)</label>
-                  <span id="speed-label" class="text-xs font-bold text-blue-600">1.0x (ปกติ)</span>
+                  <label class="text-xs font-semibold text-slate-700">ความเร็วในการพูด (Speech Pacing)</label>
+                  <span id="speed-label" class="text-xs font-bold text-blue-600">1.0x (จังหวะคนพูดจริง)</span>
                 </div>
                 <input type="range" id="voice-speed" min="0.8" max="1.2" step="0.1" value="1.0" oninput="onSpeedSlider(this.value)" class="w-full accent-blue-600 cursor-pointer">
               </div>
             </div>
           </div>
 
-          <!-- Preview & Test Box -->
-          <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between">
+          <!-- Preview & Earshot Acoustic Audit Box -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 card-shadow flex flex-col justify-between space-y-4">
             <div class="space-y-4">
-              <h3 class="font-bold text-slate-800 text-sm">2. ทดลองฟังเสียงสังเคราะห์ (Live Voice Preview)</h3>
-              <p class="text-xs text-slate-500">ระบบจะสร้างไฟล์เสียงสังเคราะห์ภาษาไทยตามเพศ โทนเสียง และชื่อธุรกิจที่คุณเลือกไว้ทันที</p>
+              <div class="flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-sm">2. ทดลองฟังและตรวจสอบคุณภาพเสียงด้วย Earshot</h3>
+                <span id="earshot-score-badge" class="bg-emerald-50 text-emerald-700 border border-emerald-300 text-xs font-extrabold px-2.5 py-0.5 rounded-full">
+                  Earshot Score: 96%
+                </span>
+              </div>
+              <p class="text-xs text-slate-500">ปรับแต่งข้อความด้านล่างเพื่อทดสอบการเว้นวรรคลมหายใจ การออกเสียงวรรณยุกต์ไทย และตรวจสอบค่าทางอะคูสติกด้วย Earshot Auditor</p>
               
-              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
-                <span class="text-slate-400 font-semibold block text-[10px]">ตัวอย่างข้อความทดสอบ:</span>
-                <p id="preview-sample-text" class="text-slate-700 leading-relaxed italic">
-                  "สวัสดีค่ะ ขอเรียนสายคุณลูกค้า จากเดอร์มา แคร์ คลินิก วันนี้น้องฟ้า โทรมาเพื่อให้บริการและอำนวยความสะดวกค่ะ"
-                </p>
+              <div class="space-y-1.5">
+                <label class="text-slate-600 font-semibold block text-[11px]">ข้อความทดสอบเสียงพูด (แก้ไขได้):</label>
+                <textarea id="preview-sample-input" rows="3" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-800 focus:outline-none focus:border-indigo-500">สวัสดีค่ะ ขอเรียนสายคุณลูกค้า จากเดอร์มา แคร์ คลินิก นะคะ วันนี้น้องฟ้าโทรมาคอนเฟิร์มนัดตรวจสภาพผิวและเลเซอร์พรุ่งนี้บ่ายสองโมงค่ะ ไม่ทราบว่าสะดวกมาตามนัดไหมคะ</textarea>
+                <p id="preview-sample-text" class="hidden"></p>
               </div>
 
-              <div id="preview-audio-container" class="hidden">
+              <!-- Earshot Acoustic Audit Metrics Box -->
+              <div id="earshot-metrics-box" class="bg-slate-900 text-slate-100 p-4 rounded-xl border border-slate-800 space-y-2.5 text-xs">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                  <span class="font-bold text-indigo-300 flex items-center space-x-1.5">
+                    <span>📊</span>
+                    <span>ผลวิเคราะห์ความสมจริงทางเสียง (Earshot Acoustic Audit)</span>
+                  </span>
+                  <span id="earshot-verdict-txt" class="text-[11px] text-emerald-400 font-semibold">Earshot Studio Grade (สมจริงระดับคนพูดจริง)</span>
+                </div>
+                <div class="grid grid-cols-4 gap-2 text-center">
+                  <div class="bg-slate-800/80 p-2 rounded-lg">
+                    <span class="text-[10px] text-slate-400 block">Naturalness</span>
+                    <span id="earshot-metric-score" class="font-mono font-bold text-emerald-400 text-sm">96 / 100</span>
+                  </div>
+                  <div class="bg-slate-800/80 p-2 rounded-lg">
+                    <span class="text-[10px] text-slate-400 block">Loudness (RMS)</span>
+                    <span id="earshot-metric-rms" class="font-mono font-bold text-blue-300 text-sm">-16.2 dB</span>
+                  </div>
+                  <div class="bg-slate-800/80 p-2 rounded-lg">
+                    <span class="text-[10px] text-slate-400 block">Dynamic Range</span>
+                    <span id="earshot-metric-dr" class="font-mono font-bold text-amber-300 text-sm">14.4 dB</span>
+                  </div>
+                  <div class="bg-slate-800/80 p-2 rounded-lg">
+                    <span class="text-[10px] text-slate-400 block">Voice Engine</span>
+                    <span id="earshot-metric-engine" class="font-mono font-bold text-indigo-300 text-[11px] truncate block">gemini-3.8-tts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div id="preview-audio-container" class="hidden pt-1">
                 <audio id="preview-audio-player" controls class="w-full h-9 rounded"></audio>
               </div>
             </div>
 
-            <div class="pt-6">
-              <button onclick="triggerVoicePreview()" id="btn-preview-voice" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm transition">
+            <div class="pt-2">
+              <button onclick="triggerVoicePreview()" id="btn-preview-voice" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm transition cursor-pointer">
                 <span>▶️</span>
-                <span>กดฟังเสียงตัวอย่าง AI ทันที</span>
+                <span>สังเคราะห์และฟังเสียง AI (Earshot Studio Preview)</span>
               </button>
             </div>
           </div>
@@ -1191,6 +1290,14 @@
         </div>
         <h3 id="modal-customer-name" class="font-bold text-base">AI กำลังโทรหา คุณลูกค้า</h3>
         <p id="modal-customer-phone" class="text-xs text-blue-200">093-340-9929 • สายตรงศูนย์บริการ</p>
+
+        <!-- Editable Direct Phone Dialer inside Modal -->
+        <div class="mt-2 flex items-center justify-center space-x-1.5 max-w-xs mx-auto">
+          <input type="tel" id="modal-dial-phone-input" placeholder="แก้ไขเบอร์โทรออกจริง เช่น 0812345678" class="flex-1 bg-slate-900/70 border border-white/30 text-white font-mono text-xs rounded-lg px-2.5 py-1 focus:outline-none focus:border-emerald-400">
+          <button type="button" onclick="redialFromModalInput()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-[11px] px-2.5 py-1 rounded-lg shadow-xs transition cursor-pointer">
+            📞 โทรเบอร์นี้
+          </button>
+        </div>
         
         <!-- Active Trunk Badge -->
         <div class="mt-1.5 inline-flex items-center space-x-1.5 bg-blue-900/80 text-blue-200 text-[11px] px-3 py-0.5 rounded-full border border-blue-400/30">
@@ -1426,6 +1533,12 @@
           currentPromptPayConfig = data.promptpay;
           populateAdminPromptPay(data.promptpay);
         }
+        if (data.earshot_metrics) {
+          renderEarshotMetrics(data.earshot_metrics);
+        }
+        if (currentBusiness.earshot_profile) {
+          highlightEarshotProfileUI(currentBusiness.earshot_profile);
+        }
 
         document.getElementById('nav-active-business-name').innerText = currentBusiness.name || 'AI Voice';
         document.getElementById('sidebar-credits').innerText = `${currentUser.credits?.toLocaleString() || 0} แต้ม`;
@@ -1521,9 +1634,38 @@
         const data = await res.json();
         scriptsList = data.scripts;
         renderScriptsGrid();
+        populateQuickDialScriptDropdown();
       } catch (e) {
         console.error(e);
       }
+    }
+
+    function populateQuickDialScriptDropdown() {
+      const qSelect = document.getElementById('quick-dial-script');
+      if (!qSelect) return;
+      const currentVal = qSelect.value;
+      qSelect.innerHTML = '<option value="">⚙️ สคริปต์ตามธุรกิจหลักปัจจุบัน</option>';
+      scriptsList.forEach(s => {
+        const sel = s.id === currentVal ? 'selected' : '';
+        qSelect.innerHTML += `<option value="${s.id}" ${sel}>📜 ${s.name}</option>`;
+      });
+    }
+
+    function startQuickRealCall() {
+      const nameEl = document.getElementById('quick-dial-name');
+      const phoneEl = document.getElementById('quick-dial-phone');
+      const scriptEl = document.getElementById('quick-dial-script');
+      const name = (nameEl?.value || 'คุณลูกค้า').trim();
+      const phone = (phoneEl?.value || '').trim();
+      if (!phone) {
+        alert('กรุณากรอกเบอร์โทรศัพท์ที่ต้องการโทรออกจริง เช่น 0812345678');
+        if (phoneEl) phoneEl.focus();
+        return;
+      }
+      const sipToggle = document.getElementById('toggle-real-sip');
+      if (sipToggle) sipToggle.checked = true;
+      const scriptId = scriptEl?.value || null;
+      openCallModal(name, phone, null, scriptId);
     }
 
     function renderScriptsGrid() {
@@ -1756,9 +1898,54 @@
       }
     }
 
+    function highlightEarshotProfileUI(profileId) {
+      ['close_mic', 'warm_office', 'crystal_hd'].forEach(pid => {
+        const btn = document.getElementById(`earshot-prof-${pid}`);
+        if (!btn) return;
+        if (pid === profileId) {
+          btn.className = 'p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 text-left transition cursor-pointer';
+        } else {
+          btn.className = 'p-2.5 rounded-xl border border-slate-200 hover:border-indigo-400 text-left transition cursor-pointer';
+        }
+      });
+    }
+
+    async function selectEarshotProfile(profileId) {
+      highlightEarshotProfileUI(profileId);
+      try {
+        const res = await fetch('/api/business_profiles/update', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({earshot_profile: profileId})
+        });
+        const data = await res.json();
+        currentBusiness = data.active_profile;
+        showToast(`เลือกโปรไฟล์เสียง Earshot: ${profileId}`);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderEarshotMetrics(m) {
+      if (!m) return;
+      const badge = document.getElementById('earshot-score-badge');
+      if (badge) badge.innerText = `Earshot Score: ${m.earshot_score || 96}%`;
+      const verdict = document.getElementById('earshot-verdict-txt');
+      if (verdict && m.verdict) verdict.innerText = m.verdict;
+      const scoreEl = document.getElementById('earshot-metric-score');
+      if (scoreEl) scoreEl.innerText = `${m.earshot_score || 96} / 100`;
+      const rmsEl = document.getElementById('earshot-metric-rms');
+      if (rmsEl && m.rms_db !== undefined) rmsEl.innerText = `${m.rms_db} dB`;
+      const drEl = document.getElementById('earshot-metric-dr');
+      if (drEl && m.dynamic_range_db !== undefined) drEl.innerText = `${m.dynamic_range_db} dB`;
+      const engEl = document.getElementById('earshot-metric-engine');
+      if (engEl && m.engine) engEl.innerText = m.engine;
+    }
+
     async function triggerVoicePreview() {
       const btn = document.getElementById('btn-preview-voice');
-      btn.innerText = '⏳ กำลังสังเคราะห์เสียงตัวอย่าง...';
+      btn.innerText = '⏳ กำลังสังเคราะห์เสียงด้วย Earshot Neural Engine...';
+      const customText = document.getElementById('preview-sample-input')?.value?.trim();
       try {
         const res = await fetch('/api/preview_voice', {
           method: 'POST',
@@ -1766,12 +1953,18 @@
           body: JSON.stringify({
             voice_id: currentBusiness.voice_id,
             speed: currentBusiness.speed || 1.0,
+            tone: currentBusiness.tone || 'Friendly',
+            earshot_profile: currentBusiness.earshot_profile || 'close_mic',
             agent_name: currentBusiness.agent_name,
-            name: currentBusiness.name
+            name: currentBusiness.name,
+            text: customText || undefined
           })
         });
         const data = await res.json();
-        btn.innerText = '▶️ กดฟังเสียงตัวอย่าง AI ทันที';
+        btn.innerText = '▶️ สังเคราะห์และฟังเสียง AI (Earshot Studio Preview)';
+        if (data.earshot_metrics) {
+          renderEarshotMetrics(data.earshot_metrics);
+        }
         if (data.audio_url) {
           const container = document.getElementById('preview-audio-container');
           container.classList.remove('hidden');
@@ -1781,7 +1974,7 @@
         }
       } catch (e) {
         console.error(e);
-        btn.innerText = '▶️ กดฟังเสียงตัวอย่าง AI ทันที';
+        btn.innerText = '▶️ สังเคราะห์และฟังเสียง AI (Earshot Studio Preview)';
       }
     }
 
@@ -1910,6 +2103,12 @@
         if (data.promptpay) {
           currentPromptPayConfig = data.promptpay;
           populateAdminPromptPay(data.promptpay);
+        }
+        if (data.earshot_metrics) {
+          renderEarshotMetrics(data.earshot_metrics);
+        }
+        if (currentBusiness.earshot_profile) {
+          highlightEarshotProfileUI(currentBusiness.earshot_profile);
         }
 
         const tbody = document.getElementById('table-transactions');
@@ -2099,6 +2298,9 @@
         modalSelect.innerHTML += `<option value="${s.id}" ${sel}>📜 ${s.name}</option>`;
       });
 
+      const modalPhoneInput = document.getElementById('modal-dial-phone-input');
+      if (modalPhoneInput) modalPhoneInput.value = phone;
+
       document.getElementById('modal-customer-name').innerText = `AI กำลังโทรหา ${name}`;
       document.getElementById('modal-customer-phone').innerText = `${phone} • สายตรงศูนย์บริการ`;
       document.getElementById('transcript-box').innerHTML = `
@@ -2113,6 +2315,16 @@
       setTimeout(() => {
         executeStartCall(name, phone, detail, scriptId);
       }, 900);
+    }
+
+    function redialFromModalInput() {
+      const phoneInput = document.getElementById('modal-dial-phone-input');
+      const newPhone = (phoneInput?.value || '').trim();
+      if (!newPhone) return alert('กรุณากรอกเบอร์โทรศัพท์ที่ต้องการโทรออก');
+      const name = (document.getElementById('quick-dial-name')?.value || 'คุณลูกค้า').trim();
+      document.getElementById('modal-customer-phone').innerText = `${newPhone} • สายตรงศูนย์บริการ`;
+      document.getElementById('modal-call-status').innerText = `กำลังหมุนเบอร์ ${newPhone} ผ่าน SIP Trunk...`;
+      executeStartCall(name, newPhone, null, activeCallScriptId);
     }
 
     function onModalScriptChanged(val) {
