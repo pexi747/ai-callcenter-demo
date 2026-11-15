@@ -2346,6 +2346,8 @@
       loadDashboard();
     }
 
+    let lastRenderedTranscriptCount = 0;
+
     async function pollSipStatus() {
       if (!currentSessionId) return;
       try {
@@ -2355,6 +2357,16 @@
         const logEl = document.getElementById('modal-sip-live-log');
         if (logEl && data.sip_events && data.sip_events.length > 0) {
           logEl.innerText = data.sip_events[data.sip_events.length - 1];
+        }
+
+        // Live Real-Time Transcript Sync for Phone Calls
+        if (data.transcript && data.transcript.length > lastRenderedTranscriptCount) {
+          for (let i = lastRenderedTranscriptCount; i < data.transcript.length; i++) {
+            const turn = data.transcript[i];
+            const isAI = turn.speaker === 'AI';
+            appendMessage(isAI ? 'AI' : 'ลูกค้า', turn.text);
+          }
+          lastRenderedTranscriptCount = data.transcript.length;
         }
       } catch (e) {
         console.error(e);
@@ -2399,6 +2411,7 @@
         }
 
         appendMessage(data.agent_name || 'AI', data.speech);
+        lastRenderedTranscriptCount = 1;
         playVoiceAudio(data.audio_url);
       } catch (err) {
         console.error('Start call error:', err);

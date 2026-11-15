@@ -1524,6 +1524,7 @@ async def get_sip_session_status(session_id: str):
         "sip_events": sip_call.sip_events,
         "target_number": sip_call.target_number,
         "proxy_ip": sip_call.proxy_ip,
+        "transcript": session.get("transcript", []),
     }
 
 
