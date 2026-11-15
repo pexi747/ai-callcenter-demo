@@ -1,5 +1,7 @@
 import os
 import sys
+import io
+import wave
 import json
 import uuid
 import asyncio
@@ -680,7 +682,8 @@ def finalize_and_record_call_session(
             if u["id"] == current_user["id"]:
                 u["credits"] = current_user["credits"]
 
-    duration_sec = max(int((datetime.now() - session["created_at"]).total_seconds()), 12)
+    start_time = session.get("created_at") or datetime.now()
+    duration_sec = max(int((datetime.now() - start_time).total_seconds()), 12)
     active_script = session.get("active_script", {})
     if not summary:
         summary = f"สนทนากับ {session['customer_name']} ({len(session.get('transcript', []))} ข้อความ) ผ่านคู่สาย {session.get('trunk_route')}"
@@ -722,6 +725,44 @@ def finalize_and_record_call_session(
 
 calls_db = load_calls_db()
 active_sessions = {}
+active_sip_calls = {}
+
+def convert_pcm_to_wav_bytes(
+    pcm_bytes: bytes,
+    sample_rate: int = 8000,
+    channels: int = 1,
+    sample_width: int = 2,
+) -> bytes:
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as wf:
+        wf.setnchannels(channels)
+        wf.setsampwidth(sample_width)
+        wf.setframerate(sample_rate)
+        wf.writeframes(pcm_bytes)
+    return buf.getvalue()
+
+def transcribe_telephony_audio(pcm_bytes: bytes) -> str:
+    if not pcm_bytes:
+        return ""
+    try:
+        wav_bytes = convert_pcm_to_wav_bytes(
+            pcm_bytes, sample_rate=8000, channels=1, sample_width=2
+        )
+        if not client:
+            print("[STT Warning] Gemini client not initialized")
+            return ""
+        response = client.models.generate_content(
+            model="gemini-3.5-flash-lite",
+            contents=[
+                types.Part.from_bytes(data=wav_bytes, mime_type="audio/wav"),
+                "จงถอดเสียงพูดภาษาไทยในไฟล์เสียงนี้เป็นข้อความสั้นๆ ห้ามใส่คำอธิบายเพิ่มเติม ห้ามมีคำนำหรือคำลงท้าย",
+            ],
+        )
+        if response and response.text:
+            return response.text.strip()
+    except Exception as e:
+        print(f"[STT Error] transcribe_telephony_audio: {e}")
+    return ""
 last_earshot_metrics = {
     "earshot_score": 96,
     "rms_db": -16.2,
@@ -1218,13 +1259,22 @@ async def start_call(data: dict):
     dial_real_sip = bool(data.get("dial_real_sip", False))
     sip_call = None
 
+    global main_loop
+    try:
+        main_loop = asyncio.get_running_loop()
+    except RuntimeError:
+        pass
+
     if dial_real_sip:
         sip_call = SIPCallSession(
             session_id=session_id,
             config=telephony_config,
             target_phone=customer_phone,
             audio_dir=AUDIO_DIR,
+            on_speech_callback=handle_live_telephony_speech,
         )
+        sip_call.session_id = session_id
+        active_sip_calls[session_id] = sip_call
         sip_call.start_outbound_call(initial_audio_url=audio_url)
 
     active_sessions[session_id] = {
@@ -1263,62 +1313,68 @@ async def start_call(data: dict):
         "sip_events": sip_call.sip_events if sip_call else [],
     }
 
-@app.post("/api/chat")
-async def chat(data: dict):
+main_loop = None
+
+async def process_chat_turn(session_id: str, user_text: str, source: str = "web") -> dict:
     global current_user
-    session_id = data.get("session_id")
-    user_speech = data.get("user_speech", "").strip()
-    
     if session_id not in active_sessions:
-        return JSONResponse(status_code=400, content={"error": "Session not found"})
-    
+        return {"error": "Session not found"}
+
     session = active_sessions[session_id]
     active_script = session.get("active_script", active_business)
-    sip_call: SIPCallSession = session.get("sip_call")
+    sip_call: SIPCallSession = session.get("sip_call") or active_sip_calls.get(session_id)
     if sip_call:
         sip_call.clear_ai_audio_queue()
+
     session["transcript"].append({
         "speaker": "Customer",
-        "text": user_speech,
+        "text": user_text,
         "time": datetime.now().strftime("%H:%M:%S"),
         "audio": None,
     })
-    
+
     result = None
     if session.get("chat_session"):
         try:
             response = session["chat_session"].send_message(
-                f"ลูกค้าพูดว่า: \"{user_speech}\"\nโปรดตอบกลับตามสคริปต์และคืนค่า JSON เท่านั้น"
+                f"ลูกค้าพูดว่า: \"{user_text}\"\nโปรดตอบกลับตามสคริปต์และคืนค่า JSON เท่านั้น"
             )
-            result = json.loads(response.text.strip())
+            raw_text = response.text.strip()
+            if raw_text.startswith("```json"):
+                raw_text = raw_text[7:]
+            if raw_text.startswith("```"):
+                raw_text = raw_text[3:]
+            if raw_text.endswith("```"):
+                raw_text = raw_text[:-3]
+            result = json.loads(raw_text.strip())
         except Exception as e:
             print("Gemini Chat Error:", e)
-            
+
     if not result:
         # High-precision Rule Fallback
-        if any(w in user_speech for w in ["ผิดเบอร์", "ไม่ใช่", "โทรผิด", "ผู้ชาย", "ไม่ใช่เบอร์"]):
+        if any(w in user_text for w in ["ผิดเบอร์", "ไม่ใช่", "โทรผิด", "ผู้ชาย", "ไม่ใช่เบอร์"]):
             result = {
                 "speech": "กราบขออภัยเป็นอย่างยิ่งค่ะ น่าจะมีการบันทึกเบอร์โทรศัพท์ผิดพลาด ขออนุญาตวางสายนะคะ ขอบคุณค่ะ",
                 "call_status": "ended",
                 "appointment_outcome": "โทรผิดเบอร์/ไม่ใช่เจ้าของ",
                 "has_new_date": "ไม่ใช่",
-                "summary": "โทรติดแต่ปลายสายแจ้งว่าไม่ใช่บุคคลเป้าหมายหรือโทรผิดเบอร์ AI จึงขออภัยและวางสาย"
+                "summary": "โทรติดแต่ปลายสายแจ้งว่าไม่ใช่บุคคลเป้าหมายหรือโทรผิดเบอร์ AI จึงขออภัยและวางสาย",
             }
-        elif any(w in user_speech for w in ["สะดวก", "มาตามนัด", "เจอกัน", "โอเค", "ไปได้", "สนใจ"]):
+        elif any(w in user_text for w in ["สะดวก", "มาตามนัด", "เจอกัน", "โอเค", "ไปได้", "สนใจ"]):
             result = {
                 "speech": f"ขอบพระคุณมากค่ะ ทาง{active_script.get('business_name')} ได้บันทึกการยืนยันเรียบร้อยแล้วค่ะ แล้วพบกันนะคะ สวัสดีค่ะ",
                 "call_status": "ended",
-                "appointment_outcome": "มาตามนัด" if "สนใจ" not in user_speech else "สนใจโปรโมชั่น",
+                "appointment_outcome": "มาตามนัด" if "สนใจ" not in user_text else "สนใจโปรโมชั่น",
                 "has_new_date": "-",
-                "summary": "ลูกค้ายืนยันสะดวกเข้ารับบริการตามวันและเวลาที่กำหนด หรือแสดงความสนใจข้อเสนอ"
+                "summary": "ลูกค้ายืนยันสะดวกเข้ารับบริการตามวันและเวลาที่กำหนด หรือแสดงความสนใจข้อเสนอ",
             }
-        elif any(w in user_speech for w in ["เลื่อน", "ไม่ว่าง", "ติดธุระ", "วันศุกร์", "วันอื่น"]):
+        elif any(w in user_text for w in ["เลื่อน", "ไม่ว่าง", "ติดธุระ", "วันศุกร์", "วันอื่น"]):
             result = {
                 "speech": "รับทราบค่ะ ได้บันทึกคำขอเลื่อนนัดหมายลงในระบบเรียบร้อยแล้วนะคะ ทางเจ้าหน้าที่จะส่งข้อความยืนยันคิวใหม่อีกครั้งค่ะ ขอบคุณค่ะ",
                 "call_status": "ended",
                 "appointment_outcome": "ขอเลื่อนนัด",
                 "has_new_date": "ใช่",
-                "summary": f"ลูกค้าขอเลื่อนวันเวลานัดหมายใหม่ ได้ลงบันทึกในระบบเรียบร้อย ({user_speech[:30]})"
+                "summary": f"ลูกค้าขอเลื่อนวันเวลานัดหมายใหม่ ได้ลงบันทึกในระบบเรียบร้อย ({user_text[:30]})",
             }
         else:
             result = {
@@ -1326,15 +1382,15 @@ async def chat(data: dict):
                 "call_status": "in_progress",
                 "appointment_outcome": "รอผล",
                 "has_new_date": "-",
-                "summary": "อยู่ระหว่างการสนทนา"
+                "summary": "อยู่ระหว่างการสนทนา",
             }
-            
+
     ai_speech = result.get("speech", "รับทราบค่ะ ขอบคุณค่ะ")
     call_status = result.get("call_status", "in_progress")
     outcome = result.get("appointment_outcome", "รอผล")
     summary = result.get("summary", "")
     has_new_date = result.get("has_new_date", "-")
-    
+
     audio_url = await synthesize_speech(
         ai_speech,
         voice_id=active_script.get("voice_id"),
@@ -1349,8 +1405,11 @@ async def chat(data: dict):
         "time": datetime.now().strftime("%H:%M:%S"),
         "audio": audio_url,
     })
+
     if sip_call and audio_url:
         sip_call.enqueue_ai_audio_file(audio_url)
+        if source == "telephony":
+            sip_call.log_event(f"AI สนทนากลับ: {ai_speech}")
 
     log_entry = None
     if call_status == "ended":
@@ -1372,6 +1431,55 @@ async def chat(data: dict):
         "summary": summary,
         "credits_remaining": current_user["credits"],
     }
+
+
+def handle_live_telephony_speech(call_session, customer_pcm_bytes: bytes):
+    session_id = getattr(call_session, "session_id", None)
+    if not session_id:
+        for sid, call in active_sip_calls.items():
+            if call == call_session:
+                session_id = sid
+                break
+    if not session_id:
+        print("[Telephony Bridge] Could not find session_id for call session")
+        return
+
+    text = transcribe_telephony_audio(customer_pcm_bytes)
+    if text and len(text.strip()) > 1:
+        clean_text = text.strip()
+        print(f"[Telephony Bridge] Customer speech detected: '{clean_text}' (session={session_id})")
+        if call_session:
+            call_session.log_event(f"ลูกค้าพูด: {clean_text}")
+
+        try:
+            target_loop = main_loop
+            if target_loop and target_loop.is_running():
+                future = asyncio.run_coroutine_threadsafe(
+                    process_chat_turn(session_id, clean_text, source="telephony"),
+                    target_loop,
+                )
+                return future.result(timeout=15.0)
+            else:
+                return asyncio.run(process_chat_turn(session_id, clean_text, source="telephony"))
+        except Exception as e:
+            print(f"[Telephony Bridge] Error in process_chat_turn: {e}")
+
+
+@app.post("/api/chat")
+async def chat(data: dict):
+    global main_loop
+    try:
+        main_loop = asyncio.get_running_loop()
+    except RuntimeError:
+        pass
+
+    session_id = data.get("session_id")
+    user_speech = data.get("user_speech", "").strip()
+
+    if session_id not in active_sessions:
+        return JSONResponse(status_code=400, content={"error": "Session not found"})
+
+    return await process_chat_turn(session_id, user_speech, source="web")
 
 
 @app.post("/api/hangup")

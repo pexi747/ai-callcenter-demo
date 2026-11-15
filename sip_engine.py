@@ -234,12 +234,31 @@ def verify_sip_registration(config: dict, timeout: float = 4.0) -> dict:
 
 
 class SIPCallSession:
-    def __init__(self, session_id: str, config: dict, target_phone: str, audio_dir: Path):
+    def __init__(
+        self,
+        session_id: str,
+        config: dict,
+        target_phone: str,
+        audio_dir: Path,
+        on_speech_callback=None,
+    ):
         self.session_id = session_id
         self.config = dict(config)
         self.raw_phone = target_phone
         self.target_number = self._normalize_thai_number(target_phone)
         self.audio_dir = audio_dir
+        self.on_speech_callback = on_speech_callback
+
+        # VAD State Variables
+        self.vad_buffer = bytearray()
+        self.vad_voice_chunks = 0
+        self.vad_silence_chunks = 0
+        self.vad_is_speaking = False
+
+        self.VOICE_RMS_THRESHOLD = 320
+        self.SILENCE_RMS_THRESHOLD = 230
+        self.MIN_VOICE_CHUNKS = 6
+        self.MAX_SILENCE_CHUNKS = 22
 
         self.sip_domain = self.config.get("server_host") or "sip.ntnextgen.com"
         self.sip_port = int(self.config.get("server_port") or 5060)
@@ -371,6 +390,13 @@ class SIPCallSession:
         )
         self._send_sip(ack_msg)
 
+    def _dispatch_speech(self, pcm_bytes: bytes):
+        if self.on_speech_callback:
+            try:
+                self.on_speech_callback(self, pcm_bytes)
+            except Exception as e:
+                self.log_event(f"Speech callback error: {e}")
+
     def _run_rtp_loop(self):
         seq = 100
         timestamp = 160
@@ -393,6 +419,43 @@ class SIPCallSession:
                         if pcm_in:
                             with self.recorded_pcm_lock:
                                 self.recorded_pcm.extend(pcm_in)
+
+                            # Calculate RMS energy for VAD
+                            try:
+                                rms = audioop.rms(pcm_in, 2)
+                            except Exception:
+                                count = len(pcm_in) // 2
+                                if count > 0:
+                                    shorts = struct.unpack(f"<{count}h", pcm_in)
+                                    import math
+                                    rms = int(math.sqrt(sum(s * s for s in shorts) / count))
+                                else:
+                                    rms = 0
+
+                            if rms >= self.VOICE_RMS_THRESHOLD:
+                                # Telephony barge-in: If user interrupts while AI is playing, flush tx buffer
+                                with self.tx_queue_lock:
+                                    if self.tx_pcm_buffer:
+                                        self.tx_pcm_buffer.clear()
+                                self.vad_is_speaking = True
+                                self.vad_voice_chunks += 1
+                                self.vad_silence_chunks = 0
+                                self.vad_buffer.extend(pcm_in)
+                            elif self.vad_is_speaking:
+                                self.vad_silence_chunks += 1
+                                self.vad_buffer.extend(pcm_in)
+                                if self.vad_silence_chunks >= self.MAX_SILENCE_CHUNKS:
+                                    if self.vad_voice_chunks >= self.MIN_VOICE_CHUNKS and self.on_speech_callback:
+                                        speech_bytes = bytes(self.vad_buffer)
+                                        threading.Thread(
+                                            target=self._dispatch_speech,
+                                            args=(speech_bytes,),
+                                            daemon=True,
+                                        ).start()
+                                    self.vad_buffer.clear()
+                                    self.vad_voice_chunks = 0
+                                    self.vad_silence_chunks = 0
+                                    self.vad_is_speaking = False
             except BlockingIOError:
                 pass
             except Exception:

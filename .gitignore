@@ -3,3 +3,4 @@ __pycache__/
 audio/
 *.log
 .env
+call_logs.json
